@@ -29,13 +29,14 @@ export interface HostSnapshot {
 
 export interface ServiceSnapshot {
   name: string;
-  kind: "pm2" | "docker";
+  kind: "pm2" | "docker" | "systemd";
   status: string;
   cpuPercent: number | null;
   memoryBytes: number | null;
   restarts?: number;
   uptimeMs?: number;
   image?: string;
+  pid?: number | null;
   networkRxBytes?: number | null;
   networkTxBytes?: number | null;
 }

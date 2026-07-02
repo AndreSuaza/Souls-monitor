@@ -23,7 +23,11 @@ async function serveFile(urlPath: string) {
   const safePath = urlPath === "/" ? "/index.html" : urlPath;
   const resolved = path.normalize(path.join(publicDir, safePath));
   if (!resolved.startsWith(publicDir)) return null;
-  const data = await fs.readFile(resolved);
+  const data = await fs.readFile(resolved).catch((error: NodeJS.ErrnoException) => {
+    if (error.code === "ENOENT" || error.code === "EISDIR") return null;
+    throw error;
+  });
+  if (!data) return null;
   const ext = path.extname(resolved);
   return { data, contentType: contentTypes[ext] || "application/octet-stream" };
 }

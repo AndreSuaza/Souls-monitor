@@ -104,6 +104,7 @@ async function collectPm2(): Promise<ServiceSnapshot[]> {
       memoryBytes: typeof proc.monit?.memory === "number" ? proc.monit.memory : null,
       restarts: typeof proc.pm2_env?.restart_time === "number" ? proc.pm2_env.restart_time : undefined,
       uptimeMs: typeof proc.pm2_env?.pm_uptime === "number" ? Date.now() - proc.pm2_env.pm_uptime : undefined,
+      pid: typeof proc.pid === "number" ? proc.pid : null,
     }));
   } catch {
     return [];
@@ -140,6 +141,43 @@ async function collectDocker(): Promise<ServiceSnapshot[]> {
         networkTxBytes: net.tx,
       };
     });
+}
+
+function parseSystemctlShow(output: string) {
+  const values = new Map<string, string>();
+  for (const line of output.split("\n")) {
+    const index = line.indexOf("=");
+    if (index > -1) values.set(line.slice(0, index), line.slice(index + 1));
+  }
+  return values;
+}
+
+async function collectSystemd(): Promise<ServiceSnapshot[]> {
+  const units = ["souls-monitor.service"];
+  const snapshots: Array<ServiceSnapshot | null> = await Promise.all(
+    units.map(async (unit) => {
+      const stdout = await run("systemctl", [
+        "show",
+        unit,
+        "--property=Id,ActiveState,SubState,MainPID,NRestarts,MemoryCurrent",
+      ]);
+      if (!stdout) return null;
+      const values = parseSystemctlShow(stdout);
+      const memoryBytes = Number(values.get("MemoryCurrent"));
+      const restarts = Number(values.get("NRestarts"));
+      const pid = Number(values.get("MainPID"));
+      return {
+        name: values.get("Id") || unit,
+        kind: "systemd" as const,
+        status: values.get("ActiveState") || values.get("SubState") || "unknown",
+        cpuPercent: null,
+        memoryBytes: Number.isFinite(memoryBytes) && memoryBytes > 0 ? memoryBytes : null,
+        restarts: Number.isFinite(restarts) ? restarts : undefined,
+        pid: Number.isFinite(pid) && pid > 0 ? pid : null,
+      };
+    }),
+  );
+  return snapshots.filter((item): item is ServiceSnapshot => item !== null);
 }
 
 async function readTail(filePath: string): Promise<string> {
@@ -235,7 +273,7 @@ async function collectNginx(): Promise<NginxSnapshot> {
 
 async function collectStorage(): Promise<StorageSnapshot> {
   const paths = await Promise.all(
-    ["/opt/apps/app-souls", "/opt/openclaw-hgga", "/var/log/nginx", "/home/deploy/.pm2/logs"].map(async (target) => {
+    ["/opt/apps/app-souls", "/opt/openclaw-hgga/data", "/opt/apps/souls-monitor", "/var/log/nginx"].map(async (target) => {
       const stdout = await run("du", ["-sb", target]);
       const bytes = Number(stdout.split(/\s+/)[0]);
       return { path: target, bytes: Number.isFinite(bytes) ? bytes : null };
@@ -279,16 +317,17 @@ function buildAlerts(snapshot: Omit<MetricsSnapshot, "alerts">): AlertItem[] {
 }
 
 async function main() {
-  const [host, pm2, docker, nginx, storage] = await Promise.all([
+  const [host, pm2, docker, systemd, nginx, storage] = await Promise.all([
     collectHost(),
     collectPm2(),
     collectDocker(),
+    collectSystemd(),
     collectNginx(),
     collectStorage(),
   ]);
   const withoutAlerts = {
     host,
-    services: [...pm2, ...docker],
+    services: [...pm2, ...docker, ...systemd],
     nginx,
     storage,
   };

@@ -1,90 +1,1594 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Souls Monitor</title>
-    <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body>
-    <main class="shell">
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">Souls In Xtinction</p>
-          <h1>Monitor VPS</h1>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Souls VPS Monitor</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237C3AED'/%3E%3Cpath d='M16 5s9 4 9 11c0 5-4 9-9 13-5-4-9-8-9-13C7 9 16 5 16 5Z' fill='none' stroke='white' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='15' r='3' fill='%23E0AE60'/%3E%3C/svg%3E">
+<style>
+  :root{
+    /* Fondos */
+    --bg:#EEF1F5; --bg-2:#F5F7FA; --card:#FBFCFE; --card-elev:#FFFFFF;
+    --table-head:#F1F5F9; --hover:#F8FAFC;
+    /* Texto */
+    --tx:#111827; --tx-2:#334155; --muted:#64748B; --faint:#94A3B8;
+    /* Bordes */
+    --bd:#E2E8F0; --bd-strong:#CBD5E1; --bd-souls:#D8C7F5;
+    /* Souls */
+    --purple:#7C3AED; --purple-deep:#4D3267; --purple-soft:#D0BCFF;
+    --purple-lite:#F3ECFF; --gold:#E0AE60; --gold-lite:#F6F3A0;
+    /* Estados */
+    --ok:#10B981; --warn:#F59E0B; --crit:#F43F5E; --info:#38BDF8;
+    --shadow:0 1px 2px rgba(15,23,42,.04), 0 1px 3px rgba(15,23,42,.03);
+    --shadow-sm:0 1px 2px rgba(15,23,42,.05);
+    --radius:8px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--tx); font-size:14px; line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer}
+  ::selection{background:var(--purple-soft)}
+
+  /* ---------- Layout ---------- */
+  .layout{display:flex;min-height:100vh}
+  .sidebar{
+    width:236px;flex:0 0 236px;background:var(--card-elev);border-right:1px solid var(--bd);
+    display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:40;
+  }
+  .app{flex:1;min-width:0;display:flex;flex-direction:column}
+
+  /* ---------- Sidebar ---------- */
+  .brand{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--bd)}
+  .brand .logo{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--purple),var(--purple-deep));
+    display:grid;place-items:center;color:#fff;flex:0 0 34px;box-shadow:0 2px 6px rgba(124,58,237,.28)}
+  .brand b{font-size:14px;font-weight:700;letter-spacing:.2px;display:block;line-height:1.1}
+  .brand span{font-size:11px;color:var(--muted)}
+  .nav{padding:12px 10px;display:flex;flex-direction:column;gap:2px}
+  .nav-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--faint);padding:12px 10px 6px;font-weight:600}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;color:var(--tx-2);
+    font-size:13.5px;font-weight:500;border:1px solid transparent}
+  .nav-item svg{flex:0 0 18px}
+  .nav-item:hover{background:var(--hover)}
+  .nav-item.active{background:var(--purple-lite);color:var(--purple);border-color:var(--bd-souls);font-weight:600}
+  .nav-item .dot{margin-left:auto;width:8px;height:8px;border-radius:50%}
+  .sidebar-foot{margin-top:auto;padding:14px;border-top:1px solid var(--bd);font-size:11.5px;color:var(--muted)}
+  .sidebar-foot .row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:30;background:rgba(251,252,254,.92);backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--bd);padding:12px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  }
+  .topbar h1{font-size:16.5px;margin:0;font-weight:700;letter-spacing:.2px}
+  .topbar .sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .topbar .hamburger{display:none;background:var(--card);border:1px solid var(--bd);border-radius:8px;
+    width:38px;height:38px;place-items:center}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+  .pill{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:8px;font-size:12.5px;font-weight:600;border:1px solid}
+  .pill .led{width:8px;height:8px;border-radius:50%}
+  .pill.healthy{background:#ECFDF5;color:#047857;border-color:#A7F3D0}
+  .pill.healthy .led{background:var(--ok);box-shadow:0 0 0 3px rgba(16,185,129,.15)}
+  .pill.warning{background:#FFFBEB;color:#B45309;border-color:#FDE68A}
+  .pill.warning .led{background:var(--warn);box-shadow:0 0 0 3px rgba(245,158,11,.15)}
+  .pill.critical{background:#FFF1F2;color:#BE123C;border-color:#FDA4AF}
+  .pill.critical .led{background:var(--crit);box-shadow:0 0 0 3px rgba(244,63,94,.15)}
+
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:8px;font-size:13px;font-weight:600;
+    background:var(--card);border:1px solid var(--bd-strong);color:var(--tx-2)}
+  .btn:hover{background:var(--hover);border-color:var(--bd-souls)}
+  .btn.primary{background:var(--purple);border-color:var(--purple);color:#fff;box-shadow:0 2px 6px rgba(124,58,237,.25)}
+  .btn.primary:hover{background:#6d28d9}
+  .btn.ghost{background:transparent;border-color:var(--bd)}
+  .btn svg{flex:0 0 auto}
+  .spin{animation:spin .7s linear}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---------- Filter bar ---------- */
+  .filterbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 22px;background:var(--bg-2);border-bottom:1px solid var(--bd)}
+  .fgroup{display:flex;flex-direction:column;gap:4px}
+  .fgroup>label{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--faint);font-weight:600;padding-left:2px}
+  .seg{display:inline-flex;background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:2px;gap:2px}
+  .seg button{border:0;background:transparent;padding:5px 10px;border-radius:6px;font-size:12.5px;font-weight:600;color:var(--muted)}
+  .seg button:hover{color:var(--tx-2)}
+  .seg button.active{background:var(--purple);color:#fff}
+  select.sel{appearance:none;background:var(--card) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>") no-repeat right 9px center;
+    border:1px solid var(--bd);border-radius:8px;padding:7px 30px 7px 11px;font-size:13px;font-weight:600;color:var(--tx-2)}
+  select.sel:hover{border-color:var(--bd-souls)}
+  .switch{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--tx-2);cursor:pointer;user-select:none}
+  .switch .track{width:38px;height:21px;border-radius:11px;background:var(--bd-strong);position:relative;transition:background .18s}
+  .switch .track::after{content:"";position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:#fff;box-shadow:var(--shadow-sm);transition:left .18s}
+  .switch.on .track{background:var(--purple)}
+  .switch.on .track::after{left:19px}
+  .filterbar .spacer{flex:1}
+
+  /* ---------- Main ---------- */
+  main{padding:20px 22px 40px;max-width:1500px;width:100%}
+  .section{background:var(--card);border:1px solid var(--bd);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px}
+  .section>.sec-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--bd);flex-wrap:wrap}
+  .section>.sec-head h2{font-size:14.5px;margin:0;font-weight:700}
+  .section>.sec-head .desc{font-size:12px;color:var(--muted)}
+  .section>.sec-head .head-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .section>.body{padding:16px}
+  .grid{display:grid;gap:14px}
+
+  /* ---------- KPI cards ---------- */
+  .kpi-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+  .kpi{background:var(--card-elev);border:1px solid var(--bd);border-radius:var(--radius);padding:13px 14px;box-shadow:var(--shadow-sm);position:relative}
+  .kpi .top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .kpi .ic{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;background:var(--purple-lite);color:var(--purple);flex:0 0 30px}
+  .kpi .lbl{font-size:12px;color:var(--muted);font-weight:600}
+  .kpi .st{margin-left:auto;width:9px;height:9px;border-radius:50%}
+  .kpi .val{font-size:23px;font-weight:800;letter-spacing:-.4px;line-height:1.1}
+  .kpi .val small{font-size:13px;font-weight:600;color:var(--faint)}
+  .kpi .delta{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;margin-top:6px;padding:2px 7px;border-radius:6px}
+  .delta.up{background:#ECFDF5;color:#047857}.delta.down{background:#FFF1F2;color:#BE123C}.delta.flat{background:var(--table-head);color:var(--muted)}
+  .delta.up.bad{background:#FFF1F2;color:#BE123C}
+  .st.ok{background:var(--ok)}.st.warn{background:var(--warn)}.st.crit{background:var(--crit)}
+
+  /* ---------- Service map cards ---------- */
+  .svc-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+  .svc{background:var(--card-elev);border:1px solid var(--bd);border-radius:var(--radius);padding:15px;box-shadow:var(--shadow-sm);
+    cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .1s;position:relative}
+  .svc:hover{border-color:var(--bd-souls);box-shadow:0 4px 14px rgba(124,58,237,.1);transform:translateY(-1px)}
+  .svc .svc-top{display:flex;align-items:flex-start;gap:11px;margin-bottom:13px}
+  .svc .svc-ic{width:40px;height:40px;border-radius:9px;display:grid;place-items:center;flex:0 0 40px;color:#fff}
+  .svc .svc-ic.p{background:linear-gradient(135deg,var(--purple),var(--purple-deep))}
+  .svc .svc-ic.g{background:linear-gradient(135deg,var(--gold),#c98f3d)}
+  .svc .svc-ic.i{background:linear-gradient(135deg,var(--info),#0ea5e9)}
+  .svc h3{margin:0;font-size:14.5px;font-weight:700}
+  .svc .rt{font-size:11.5px;color:var(--muted)}
+  .svc .badge-st{margin-left:auto}
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px 12px;margin:4px 0 13px}
+  .metric{display:flex;flex-direction:column}
+  .metric .m-l{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--faint);font-weight:600}
+  .metric .m-v{font-size:14px;font-weight:700}
+  .svc .svc-foot{display:flex;align-items:center;gap:8px;padding-top:12px;border-top:1px solid var(--bd)}
+  .svc .alerts-mini{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-weight:600}
+  .svc .see{margin-left:auto;color:var(--purple);font-weight:700;font-size:12.5px;display:inline-flex;align-items:center;gap:4px}
+
+  /* ---------- Badges / chips ---------- */
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;font-size:11.5px;font-weight:700;border:1px solid}
+  .badge .led{width:7px;height:7px;border-radius:50%}
+  .badge.ok{background:#ECFDF5;color:#047857;border-color:#A7F3D0}.badge.ok .led{background:var(--ok)}
+  .badge.warn{background:#FFFBEB;color:#B45309;border-color:#FDE68A}.badge.warn .led{background:var(--warn)}
+  .badge.crit{background:#FFF1F2;color:#BE123C;border-color:#FDA4AF}.badge.crit .led{background:var(--crit)}
+  .badge.info{background:#F0F9FF;color:#0369A1;border-color:#BAE6FD}.badge.info .led{background:var(--info)}
+  .badge.neutral{background:var(--table-head);color:var(--tx-2);border-color:var(--bd)}.badge.neutral .led{background:var(--faint)}
+  .badge.purple{background:var(--purple-lite);color:var(--purple);border-color:var(--bd-souls)}.badge.purple .led{background:var(--purple)}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:700;border:1px solid var(--bd);background:var(--card-elev)}
+  .chip b{font-weight:800}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+
+  /* ---------- Tables ---------- */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--bd);border-radius:8px}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+  thead th{background:var(--table-head);text-align:left;padding:9px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:700;white-space:nowrap;border-bottom:1px solid var(--bd)}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--bd);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:0}
+  tbody tr:hover{background:var(--hover)}
+  td.mono,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+  .bar-cell{display:flex;align-items:center;gap:8px}
+  .bar-cell .track{flex:1;height:7px;border-radius:4px;background:var(--table-head);overflow:hidden;min-width:60px}
+  .bar-cell .fill{height:100%;border-radius:4px;background:var(--purple)}
+
+  .searchbox{display:flex;align-items:center;gap:8px;background:var(--card-elev);border:1px solid var(--bd);border-radius:8px;padding:7px 11px;min-width:180px}
+  .searchbox input{border:0;outline:0;background:transparent;font-size:13px;width:100%;color:var(--tx)}
+  .searchbox input::placeholder{color:var(--faint)}
+
+  /* ---------- Charts ---------- */
+  .chartbox{position:relative}
+  .chart svg{width:100%;height:auto;display:block}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .legend .li{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--tx-2)}
+  .legend .sw{width:11px;height:11px;border-radius:3px}
+  .legend .sw.line{height:4px;width:16px;border-radius:2px}
+  .tooltip{position:absolute;pointer-events:none;background:var(--card-elev);border:1px solid var(--bd-strong);border-radius:8px;
+    box-shadow:0 6px 20px rgba(15,23,42,.14);padding:8px 10px;font-size:12px;min-width:132px;opacity:0;transition:opacity .1s;z-index:10;transform:translate(-50%,-112%)}
+  .tooltip .tt-t{font-weight:700;font-size:11.5px;color:var(--muted);margin-bottom:5px}
+  .tooltip .tt-r{display:flex;align-items:center;gap:7px;margin-top:3px}
+  .tooltip .tt-r .sw{width:9px;height:9px;border-radius:2px}
+  .tooltip .tt-r .v{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums}
+  .donut-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .donut-legend{display:flex;flex-direction:column;gap:8px;flex:1;min-width:180px}
+  .donut-legend .dl{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;border:1px solid var(--bd);background:var(--card-elev)}
+  .donut-legend .dl .sw{width:11px;height:11px;border-radius:3px;flex:0 0 11px}
+  .donut-legend .dl .nm{font-weight:600}
+  .donut-legend .dl .pc{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums}
+  .donut-legend .dl .ct{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+  /* ---------- Two column layouts ---------- */
+  .cols-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .cols-32{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+  @media(max-width:920px){.cols-2,.cols-32{grid-template-columns:1fr}}
+
+  /* ---------- Errors section panels (no nested cards) ---------- */
+  .panel-title{font-size:12px;font-weight:700;color:var(--tx-2);margin:0 0 10px;display:flex;align-items:center;gap:7px}
+  .panel-title .muted{color:var(--muted);font-weight:600;font-size:11.5px}
+  .mini-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}
+  .mini{padding:10px 11px;border-radius:8px;background:var(--bg-2);border:1px solid var(--bd)}
+  .mini .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--faint);font-weight:600}
+  .mini .v{font-size:19px;font-weight:800;letter-spacing:-.3px}
+  .ep-list{display:flex;flex-direction:column;gap:2px}
+  .ep{display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px dashed var(--bd)}
+  .ep:last-child{border-bottom:0}
+  .ep .rt{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;font-weight:600}
+  .ep .ct{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums}
+
+  /* status matrix */
+  .matrix{display:flex;flex-direction:column;gap:9px}
+  .matrix .mrow{display:flex;align-items:center;gap:8px}
+  .matrix .mname{width:104px;flex:0 0 104px;font-size:12px;font-weight:600;color:var(--tx-2)}
+  .matrix .cells{display:grid;grid-auto-flow:column;gap:3px;flex:1}
+  .matrix .cell{height:20px;border-radius:3px;background:var(--ok);opacity:.9}
+  .matrix .cell.warn{background:var(--warn)}.matrix .cell.crit{background:var(--crit)}.matrix .cell.idle{background:var(--bd)}
+  .matrix .axis{display:flex;justify-content:space-between;font-size:10.5px;color:var(--faint);margin-left:112px;margin-top:2px}
+  .matrix-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:10px}
+  .matrix-legend span{display:inline-flex;align-items:center;gap:6px}
+  .matrix-legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  /* ---------- Costs / meters ---------- */
+  .cost-input{display:flex;align-items:center;gap:8px;background:var(--card-elev);border:1px solid var(--bd-strong);border-radius:8px;padding:8px 12px;max-width:280px}
+  .cost-input span{color:var(--muted);font-weight:700}
+  .cost-input input{border:0;outline:0;font-size:18px;font-weight:800;width:100%;background:transparent;color:var(--tx);font-variant-numeric:tabular-nums}
+  .meter{margin-bottom:12px}
+  .meter .mt-top{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+  .meter .mt-top .nm{font-weight:700;font-size:13px}
+  .meter .mt-top .cost{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums}
+  .meter .mt-top .pc{font-size:12px;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
+  .meter .track{height:12px;border-radius:6px;background:var(--table-head);overflow:hidden}
+  .meter .fill{height:100%;border-radius:6px}
+  .note{font-size:12px;color:var(--muted);background:var(--purple-lite);border:1px solid var(--bd-souls);border-radius:8px;padding:9px 12px;display:flex;gap:8px;align-items:flex-start}
+  .note svg{flex:0 0 16px;color:var(--purple);margin-top:1px}
+
+  /* ---------- Alerts timeline ---------- */
+  .timeline{display:flex;flex-direction:column}
+  .tl{display:flex;gap:12px;padding:11px 4px;border-bottom:1px solid var(--bd)}
+  .tl:last-child{border-bottom:0}
+  .tl .tick{flex:0 0 10px;position:relative}
+  .tl .tick i{position:absolute;top:4px;left:0;width:10px;height:10px;border-radius:50%;border:2px solid var(--card)}
+  .tl .tick::before{content:"";position:absolute;top:14px;left:4px;bottom:-11px;width:2px;background:var(--bd)}
+  .tl:last-child .tick::before{display:none}
+  .tl .body-tl{flex:1}
+  .tl .meta{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);margin-bottom:2px}
+  .tl .msg{font-size:13px;font-weight:600;color:var(--tx-2)}
+  i.led-ok{background:var(--ok)}i.led-warn{background:var(--warn)}i.led-crit{background:var(--crit)}i.led-info{background:var(--info)}
+
+  /* ---------- Detail ---------- */
+  .detail-head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  .detail-head .d-ic{width:52px;height:52px;border-radius:11px;display:grid;place-items:center;color:#fff;flex:0 0 52px}
+  .detail-head h2{margin:0;font-size:19px;font-weight:800}
+  .detail-head .dh-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+  .detail-head .dh-right{margin-left:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-top:16px}
+  .stat{background:var(--bg-2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px}
+  .stat .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--faint);font-weight:600}
+  .stat .v{font-size:17px;font-weight:800;letter-spacing:-.3px}
+
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--bd);padding:0 16px;overflow-x:auto}
+  .tab{border:0;background:transparent;padding:12px 14px;font-size:13.5px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+  .tab:hover{color:var(--tx-2)}
+  .tab.active{color:var(--purple);border-bottom-color:var(--purple)}
+  .tab .tag{background:var(--crit);color:#fff;border-radius:20px;font-size:10px;padding:1px 6px;font-weight:800}
+
+  .kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .kv .item{padding:11px 12px;border-radius:8px;background:var(--bg-2);border:1px solid var(--bd)}
+  .kv .item .k{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:3px}
+  .kv .item .v{font-weight:700}
+
+  .sec-block{margin-bottom:18px}
+  .sec-block:last-child{margin-bottom:0}
+  .sec-block h3{font-size:13px;font-weight:700;margin:0 0 11px;display:flex;align-items:center;gap:8px}
+  .sec-block h3 .muted{font-weight:600;color:var(--muted);font-size:11.5px}
+
+  .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:34px 20px;color:var(--muted);text-align:center}
+  .empty svg{color:var(--faint)}
+  .empty b{color:var(--tx-2)}
+
+  .rec{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--bg-2);margin-bottom:9px}
+  .rec:last-child{margin-bottom:0}
+  .rec .rec-t{font-weight:700;font-size:13px}
+  .rec .rec-d{font-size:12.5px;color:var(--muted)}
+
+  .hidden{display:none!important}
+
+  .section,.kpi,.svc,.sec-block{animation:fadeUp .28s ease both}
+  .kpi:nth-child(2),.svc:nth-child(2){animation-delay:.03s}
+  .kpi:nth-child(3),.svc:nth-child(3){animation-delay:.06s}
+  .kpi:nth-child(4){animation-delay:.09s}
+  .chart svg path,.chart svg rect,.chart svg circle{transition:opacity .15s ease,filter .15s ease,transform .15s ease}
+  .chart svg rect:hover,.chart svg circle:hover{filter:drop-shadow(0 3px 5px rgba(124,58,237,.22))}
+  .chart svg path{animation:drawIn .38s ease both}
+  .bar-cell .fill,.meter .fill{animation:growX .42s ease both;transform-origin:left center}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes drawIn{from{opacity:.35}to{opacity:1}}
+  @keyframes growX{from{transform:scaleX(.08)}to{transform:scaleX(1)}}
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+  }
+
+  /* ---------- Responsive ---------- */
+  .scrim{display:none}
+  @media(max-width:1040px){
+    .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);transition:transform .22s;box-shadow:0 0 40px rgba(15,23,42,.16)}
+    .sidebar.open{transform:translateX(0)}
+    .topbar .hamburger{display:grid}
+    .scrim.show{display:block;position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:35}
+  }
+  @media(max-width:720px){
+    main{padding:14px 12px 40px}
+    .topbar{padding:10px 12px}
+    .filterbar{padding:10px 12px}
+    .section>.body{padding:12px}
+    .cols-2,.cols-32{grid-template-columns:1fr}
+    .topbar h1{font-size:15px}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2s7 3 7 9c0 4-3 7-7 11-4-4-7-7-7-11 0-6 7-9 7-9Z"/><circle cx="12" cy="10" r="2.4"/></svg>
+      </div>
+      <div>
+        <b>Souls VPS Monitor</b>
+        <span>Contabo · Operaciones</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Vistas</div>
+      <a class="nav-item active" data-nav="general">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Vista General
+      </a>
+      <a class="nav-item" data-nav="detail">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 4-6"/></svg>
+        Vista Detalle
+      </a>
+      <div class="nav-label">Servicios</div>
+      <a class="nav-item" data-svc="app-souls">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+        app-souls <span class="dot" style="background:var(--ok)"></span>
+      </a>
+      <a class="nav-item" data-svc="openclaw">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 8-6-16-3 8H2"/></svg>
+        OpenClaw <span class="dot" style="background:var(--ok)"></span>
+      </a>
+      <a class="nav-item" data-svc="souls-monitor">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        Souls Monitor <span class="dot" style="background:var(--ok)"></span>
+      </a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="row"><span class="led" style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span> VPS operativa</div>
+      <div class="row">CPU 16.4% · RAM 15%</div>
+      <div class="row">Disco 34.2 GB / 80 GB</div>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <!-- ============ APP ============ -->
+  <div class="app">
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="hamburger" id="hamburger" aria-label="Menú">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div>
+        <h1>Souls VPS Monitor</h1>
+        <div class="sub">Contabo · monitor.soulsinxtinction.com · última actualización <span id="lastUpdate">hace 34s</span></div>
+      </div>
+      <div class="topbar-right">
+        <span class="pill critical" id="globalStatus"><span class="led"></span> <span id="globalStatusText">Warning</span></span>
+        <button class="btn" id="refreshBtn">
+          <svg id="refreshIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+          Refresh
+        </button>
+      </div>
+    </header>
+
+    <!-- Global filters -->
+    <div class="filterbar">
+      <div class="fgroup">
+        <label>Rango de tiempo</label>
+        <div class="seg" id="timeSeg">
+          <button data-t="15m">15m</button>
+          <button data-t="1h">1h</button>
+          <button data-t="6h">6h</button>
+          <button data-t="24h" class="active">24h</button>
+          <button data-t="7d">7d</button>
         </div>
-        <div class="status-pill" id="freshness">Cargando</div>
-      </header>
+      </div>
+      <div class="fgroup">
+        <label>Servicio</label>
+        <select class="sel" id="fService">
+          <option value="all">Todos</option>
+          <option value="app-souls">app-souls</option>
+          <option value="openclaw">OpenClaw</option>
+          <option value="souls-monitor">Souls Monitor</option>
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Tipo de tráfico</label>
+        <select class="sel" id="fTraffic">
+          <option value="all">Todos</option>
+          <option value="pages">Páginas</option>
+          <option value="images">Imágenes</option>
+          <option value="api">API</option>
+          <option value="bots">Bots</option>
+          <option value="errors">Errores</option>
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Severidad</label>
+        <select class="sel" id="fSeverity">
+          <option value="all">Todas</option>
+          <option value="ok">OK</option>
+          <option value="warn">Warning</option>
+          <option value="crit">Critical</option>
+        </select>
+      </div>
+      <div class="spacer"></div>
+      <label class="switch" id="autoRefresh"><span class="track"></span> Auto-refresh</label>
+      <label class="switch" id="comparePrev"><span class="track"></span> Comparar periodo anterior</label>
+    </div>
 
-      <section class="alert-strip" id="alerts"></section>
+    <main>
+      <!-- ========================================================= -->
+      <!-- ============          VISTA GENERAL          ============ -->
+      <!-- ========================================================= -->
+      <section id="view-general">
 
-      <section class="kpi-grid">
-        <article class="metric">
-          <span>RAM usada</span>
-          <strong id="ram">-</strong>
-          <div class="bar"><i id="ramBar"></i></div>
-        </article>
-        <article class="metric">
-          <span>Disco principal</span>
-          <strong id="disk">-</strong>
-          <div class="bar"><i id="diskBar"></i></div>
-        </article>
-        <article class="metric">
-          <span>Requests analizados</span>
-          <strong id="requests">-</strong>
-          <small id="bytes">-</small>
-        </article>
-        <article class="metric">
-          <span>Servicios activos</span>
-          <strong id="servicesCount">-</strong>
-          <small>PM2 + Docker</small>
-        </article>
-      </section>
+        <!-- 2. KPIs -->
+        <div class="grid kpi-grid" id="g-kpis" style="margin-bottom:18px"></div>
 
-      <section class="panel-grid">
-        <section class="panel">
-          <div class="panel-head">
-            <h2>Servicios</h2>
-            <span>Consumo actual</span>
+        <!-- 3. Mapa de servicios -->
+        <div class="section">
+          <div class="sec-head">
+            <h2>Mapa de servicios</h2>
+            <span class="desc">Click en una tarjeta para abrir el detalle</span>
+            <div class="head-right"><span class="badge purple"><span class="led"></span> <span id="svcActiveCount">3/3</span> activos</span></div>
           </div>
-          <div class="table" id="services"></div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-head">
-            <h2>Rutas top</h2>
-            <span>Ordenado por transferencia</span>
-          </div>
-          <div class="table" id="routes"></div>
-        </section>
-      </section>
-
-      <section class="panel-grid">
-        <section class="panel">
-          <div class="panel-head">
-            <h2>Estado HTTP</h2>
-            <span>Nginx app-souls</span>
-          </div>
-          <div class="chips" id="statuses"></div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-head">
-            <h2>Almacenamiento</h2>
-            <span>Rutas vigiladas</span>
-          </div>
-          <div class="table" id="storage"></div>
-        </section>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head">
-          <h2>User agents sospechosos</h2>
-          <span>Bots, crawlers y clientes automatizados</span>
+          <div class="body"><div class="grid svc-grid" id="g-services"></div></div>
         </div>
-        <div class="table" id="userAgents"></div>
+
+        <!-- 4 & 5. Traffic + Resources -->
+        <div class="cols-2">
+          <div class="section">
+            <div class="sec-head">
+              <h2>Tráfico y transferencia</h2>
+              <span class="desc">requests vs MB transferidos</span>
+            </div>
+            <div class="body">
+              <div class="chartbox chart" id="chart-traffic"></div>
+              <div class="legend">
+                <span class="li"><span class="sw line" style="background:var(--purple)"></span> Requests</span>
+                <span class="li"><span class="sw line" style="background:var(--gold)"></span> MB transferidos</span>
+                <span class="li" id="trafficCompareLi" style="display:none"><span class="sw line" style="background:var(--bd-strong)"></span> Periodo anterior</span>
+              </div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="sec-head">
+              <h2>Uso de recursos por servicio</h2>
+              <span class="desc">CPU · RAM · Transferencia</span>
+            </div>
+            <div class="body">
+              <div class="chartbox chart" id="chart-resources"></div>
+              <div class="legend">
+                <span class="li"><span class="sw" style="background:var(--purple)"></span> CPU %</span>
+                <span class="li"><span class="sw" style="background:var(--gold)"></span> RAM (norm.)</span>
+                <span class="li"><span class="sw" style="background:var(--purple-deep)"></span> Transfer (norm.)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Top rutas -->
+        <div class="section">
+          <div class="sec-head">
+            <h2>Top rutas por consumo</h2>
+            <span class="desc">barras por transferencia · <span id="routesFilterNote" class="mono">todos</span></span>
+          </div>
+          <div class="body"><div class="chart" id="chart-routes"></div></div>
+        </div>
+
+        <!-- 7. Errores y status codes -->
+        <div class="section">
+          <div class="sec-head"><h2>Errores y status codes</h2><span class="desc">últimos 60 minutos</span></div>
+          <div class="body">
+            <div class="cols-2" style="margin-bottom:16px">
+              <div>
+                <div class="mini-kpis" id="err-kpis" style="margin-bottom:16px"></div>
+                <div class="panel-title">Chips por status code</div>
+                <div class="chips" id="err-chips"></div>
+              </div>
+              <div>
+                <div class="panel-title">Endpoints con más errores</div>
+                <div class="ep-list" id="err-endpoints"></div>
+              </div>
+            </div>
+            <div class="panel-title">Matriz de estado por hora <span class="muted">· salud por servicio en las últimas 24h</span></div>
+            <div class="matrix" id="err-matrix"></div>
+            <div class="matrix-legend">
+              <span><i style="background:var(--ok)"></i> OK</span>
+              <span><i style="background:var(--warn)"></i> Warning</span>
+              <span><i style="background:var(--crit)"></i> Critical</span>
+              <span><i style="background:var(--bd)"></i> Sin datos</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. Bots -->
+        <div class="section">
+          <div class="sec-head">
+            <h2>Bots y tráfico sospechoso</h2>
+            <div class="head-right">
+              <div class="searchbox" style="min-width:150px">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+                <input id="botSearch" placeholder="Buscar user-agent…">
+              </div>
+              <select class="sel" id="botUA">
+                <option value="all">User-agent: Todos</option>
+                <option value="bot">Bots conocidos</option>
+                <option value="susp">Sospechosos</option>
+              </select>
+            </div>
+          </div>
+          <div class="body">
+            <div class="cols-32">
+              <div>
+                <div class="panel-title">Composición del tráfico</div>
+                <div class="chart" id="chart-composition"></div>
+              </div>
+              <div>
+                <div class="panel-title">Detalle de agentes</div>
+                <div class="tbl-wrap">
+                  <table id="bots-table">
+                    <thead><tr><th>User-agent</th><th>Tipo</th><th class="num">Requests</th><th>Última vez</th><th>Acción</th></tr></thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 9. Costos y capacidad -->
+        <div class="section">
+          <div class="sec-head"><h2>Costos y capacidad</h2><span class="desc">estimación proporcional configurable</span></div>
+          <div class="body">
+            <div class="cols-2">
+              <div>
+                <div class="panel-title">Costo mensual VPS <span class="muted">· editable</span></div>
+                <div class="cost-input" style="margin-bottom:12px">
+                  <span>€</span><input type="number" id="costGeneral" value="15.00" step="0.5" min="0">
+                  <span style="font-size:12px;color:var(--faint);font-weight:600">/ mes</span>
+                </div>
+                <div class="chips" style="margin-bottom:12px">
+                  <span class="chip">Proyección <span class="badge warn" id="projState" style="margin-left:4px"><span class="led"></span> Medio</span></span>
+                </div>
+                <div class="note">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+                  Estimación basada en CPU, RAM, disco y transferencia local. No refleja facturación real de Contabo.
+                </div>
+              </div>
+              <div>
+                <div class="panel-title">Distribución estimada por servicio</div>
+                <div id="cost-meters"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10. Alertas recientes -->
+        <div class="section">
+          <div class="sec-head"><h2>Alertas recientes</h2><span class="desc" id="alertsNote">timeline de eventos</span></div>
+          <div class="body"><div class="timeline" id="g-alerts"></div></div>
+        </div>
+
       </section>
+
+      <!-- ========================================================= -->
+      <!-- ============          VISTA DETALLE          ============ -->
+      <!-- ========================================================= -->
+      <section id="view-detail" class="hidden">
+        <div class="section">
+          <div class="body">
+            <div class="detail-head">
+              <div class="d-ic" id="d-ic"></div>
+              <div>
+                <h2 id="d-name">app-souls</h2>
+                <div class="dh-meta" id="d-meta"></div>
+              </div>
+              <div class="dh-right">
+                <select class="sel" id="d-service">
+                  <option value="app-souls">app-souls</option>
+                  <option value="openclaw">OpenClaw</option>
+                  <option value="souls-monitor">Souls Monitor</option>
+                </select>
+                <button class="btn" id="backBtn">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                  Volver a General
+                </button>
+              </div>
+            </div>
+            <div class="stat-row" id="d-stats"></div>
+          </div>
+          <div class="tabs" id="d-tabs">
+            <button class="tab active" data-tab="performance">Performance</button>
+            <button class="tab" data-tab="trafico">Tráfico</button>
+            <button class="tab" data-tab="logs">Logs y Errores</button>
+            <button class="tab" data-tab="storage">Almacenamiento</button>
+            <button class="tab" data-tab="costos">Costos</button>
+            <button class="tab" data-tab="seguridad">Seguridad</button>
+          </div>
+          <div class="body" id="d-tabpanel"></div>
+        </div>
+      </section>
+
     </main>
-    <script src="/app.js"></script>
-  </body>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* =========================================================================
+   PALETA (para gráficas SVG)
+========================================================================= */
+const C={purple:"#7C3AED",purpleDeep:"#4D3267",purpleSoft:"#D0BCFF",purpleLite:"#F3ECFF",
+  gold:"#E0AE60",goldLite:"#F6F3A0",ok:"#10B981",warn:"#F59E0B",crit:"#F43F5E",info:"#38BDF8",
+  bd:"#E2E8F0",bdStrong:"#CBD5E1",muted:"#64748B",faint:"#94A3B8",tableHead:"#F1F5F9"};
+
+/* =========================================================================
+   DATOS MOCK
+========================================================================= */
+let SERVICES={
+  "app-souls":{id:"app-souls",name:"app-souls",status:"Online",level:"ok",runtime:"PM2",
+    port:"127.0.0.1:3000",mem:650,cpu:8.4,uptime:"3d 12h",requests:18420,transfer:482,errorRate:0.7,
+    icon:"p",exposure:"Público · Nginx + Cloudflare + HTTPS",alertsW:1,alertsC:1,costShare:72},
+  "openclaw":{id:"openclaw",name:"OpenClaw",status:"Running",level:"ok",runtime:"Docker",
+    port:"127.0.0.1:46858",mem:530,cpu:4.2,uptime:"1d 8h",requests:640,transfer:22,errorRate:0.2,
+    icon:"g",exposure:"Privado · 127.0.0.1 (sin exposición pública)",alertsW:0,alertsC:0,costShare:24,
+    container:"openclaw-hgga-openclaw-1"},
+  "souls-monitor":{id:"souls-monitor",name:"Souls Monitor",status:"Online",level:"ok",runtime:"systemd + Node.js",
+    port:"127.0.0.1:3101",mem:14,cpu:1.1,uptime:"18h",requests:210,transfer:8,errorRate:0.0,
+    icon:"i",exposure:"Público · HTTPS + Basic Auth",alertsW:1,alertsC:0,costShare:4,
+    domain:"monitor.soulsinxtinction.com"}
+};
+const SVC_ORDER=["app-souls","openclaw","souls-monitor"];
+
+let TOP_ROUTES=[
+  {route:"/_next/image",transfer:168,requests:3240,risk:"warn",riskLabel:"Medio",highlight:true,type:"images"},
+  {route:"/boveda",transfer:139,requests:1840,risk:"ok",riskLabel:"Bajo",highlight:true,type:"pages"},
+  {route:"/laboratorio",transfer:75,requests:920,risk:"ok",riskLabel:"Bajo",type:"pages"},
+  {route:"/cartas",transfer:40,requests:1210,risk:"ok",riskLabel:"Bajo",type:"pages"},
+  {route:"/boveda/:slug",transfer:40,requests:780,risk:"ok",riskLabel:"Bajo",type:"pages"}
+];
+
+let BOTS=[
+  {ua:"SiteCheckerBotCrawler",type:"susp",requests:412,last:"hace 3m",action:"Bloquear"},
+  {ua:"Bingbot",type:"bot",requests:308,last:"hace 1m",action:"Permitir"},
+  {ua:"Googlebot",type:"bot",requests:295,last:"hace 40s",action:"Permitir"},
+  {ua:"Baiduspider",type:"susp",requests:187,last:"hace 6m",action:"Limitar"},
+  {ua:"SemrushBot",type:"susp",requests:164,last:"hace 12m",action:"Bloquear"},
+  {ua:"AhrefsBot",type:"susp",requests:151,last:"hace 9m",action:"Limitar"},
+  {ua:"zgrab",type:"susp",requests:96,last:"hace 2m",action:"Bloquear"},
+  {ua:"curl",type:"susp",requests:74,last:"hace 5m",action:"Revisar"},
+  {ua:"python-requests",type:"susp",requests:58,last:"hace 8m",action:"Revisar"}
+];
+
+let ALERTS=[
+  {level:"crit",time:"14:52",svc:"app-souls",msg:"Picos 5xx detectados en la última hora"},
+  {level:"warn",time:"14:31",svc:"app-souls",msg:"Aumento de transferencia en /_next/image"},
+  {level:"warn",time:"13:58",svc:"souls-monitor",msg:"Tráfico sospechoso bloqueado por Basic Auth"},
+  {level:"ok",time:"13:40",svc:"openclaw",msg:"OpenClaw · Telegram default works"},
+  {level:"ok",time:"13:39",svc:"openclaw",msg:"OpenClaw · Telegram imagenes works"}
+];
+
+const LOGS=[
+  {time:"14:52:11",svc:"app-souls",sev:"crit",msg:"Internal Server Error en render de bóveda",status:500,route:"/boveda/:slug",ua:"Mozilla/5.0 (usuario)"},
+  {time:"14:49:03",svc:"souls-monitor",sev:"warn",msg:"Intento de acceso no autorizado a /.env",status:401,route:"/.env",ua:"zgrab"},
+  {time:"14:47:58",svc:"souls-monitor",sev:"warn",msg:"Intento a /docker-compose.yml bloqueado",status:401,route:"/docker-compose.yml",ua:"python-requests"},
+  {time:"14:45:22",svc:"app-souls",sev:"warn",msg:"Latencia elevada en /_next/image",status:200,route:"/_next/image",ua:"Googlebot"},
+  {time:"14:42:10",svc:"openclaw",sev:"ok",msg:"Telegram default works · polling activo",status:200,route:"agent:telegram",ua:"internal"},
+  {time:"14:41:47",svc:"openclaw",sev:"ok",msg:"Agent 'facturas' completó tarea",status:200,route:"agent:facturas",ua:"internal"},
+  {time:"14:40:31",svc:"souls-monitor",sev:"ok",msg:"Collector updated metrics.json",status:200,route:"collector",ua:"systemd-timer"},
+  {time:"14:38:09",svc:"app-souls",sev:"crit",msg:"5xx upstream timeout en API interna",status:502,route:"/api/cartas",ua:"Mozilla/5.0 (usuario)"},
+  {time:"14:36:55",svc:"openclaw",sev:"ok",msg:"Telegram imagenes works · agente 'imagenes'",status:200,route:"agent:imagenes",ua:"internal"},
+  {time:"14:34:12",svc:"app-souls",sev:"warn",msg:"Redirección 301 en ruta legacy",status:301,route:"/laboratorio-old",ua:"Bingbot"},
+  {time:"14:31:40",svc:"app-souls",sev:"warn",msg:"Spike de transferencia en /_next/image",status:200,route:"/_next/image",ua:"SiteCheckerBotCrawler"},
+  {time:"14:28:19",svc:"souls-monitor",sev:"warn",msg:"401 Basic Auth · escaneo automatizado",status:401,route:"/admin",ua:"SemrushBot"},
+  {time:"14:25:03",svc:"app-souls",sev:"ok",msg:"Página bóveda servida correctamente",status:200,route:"/boveda",ua:"Mozilla/5.0 (usuario)"},
+  {time:"14:22:47",svc:"app-souls",sev:"crit",msg:"Error 500 en handler de imagen",status:500,route:"/_next/image",ua:"Mozilla/5.0 (usuario)"},
+  {time:"14:19:31",svc:"openclaw",sev:"warn",msg:"Reintento API Gemini (rate-limit)",status:429,route:"agent:facturas",ua:"internal"},
+  {time:"14:15:08",svc:"souls-monitor",sev:"ok",msg:"Health check dashboard OK",status:200,route:"/healthz",ua:"internal"}
+];
+
+let STORAGE=[
+  {path:"/opt/apps/app-souls",svc:"app-souls",size:"3.8 GB",pct:62,growth:"+180 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acción"},
+  {path:"/opt/openclaw-hgga/data",svc:"openclaw",size:"1.4 GB",pct:34,growth:"+64 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acción"},
+  {path:"/opt/apps/souls-monitor",svc:"souls-monitor",size:"210 MB",pct:12,growth:"+9 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acción"},
+  {path:"/var/log/nginx",svc:"app-souls",size:"2.1 GB",pct:78,growth:"+420 MB",risk:"warn",riskLabel:"Medio",rec:"Configurar logrotate"}
+];
+
+/* Cost shares por servicio (CPU/RAM/storage/transfer) */
+const COST_SHARES={
+  "app-souls":[{k:"CPU share",v:40,c:C.purple},{k:"RAM share",v:30,c:C.gold},{k:"Storage share",v:12,c:C.purpleDeep},{k:"Transfer share",v:18,c:C.info}],
+  "openclaw":[{k:"CPU share",v:34,c:C.purple},{k:"RAM share",v:40,c:C.gold},{k:"Storage share",v:18,c:C.purpleDeep},{k:"Transfer share",v:8,c:C.info}],
+  "souls-monitor":[{k:"CPU share",v:20,c:C.purple},{k:"RAM share",v:26,c:C.gold},{k:"Storage share",v:14,c:C.purpleDeep},{k:"Transfer share",v:40,c:C.info}]
+};
+
+let HOST={
+  cpu:16.4,
+  ramPercent:15,
+  ramUsedMb:1194,
+  diskUsedGb:34.2,
+  diskPercent:43,
+  diskTotalGb:80,
+  activeServices:3,
+  totalServices:3,
+  generatedAt:null
+};
+let liveSnapshot=null;
+
+/* =========================================================================
+   ESTADO
+========================================================================= */
+const state={
+  view:"general",detailService:"app-souls",detailTab:"performance",
+  timeRange:"24h",service:"all",traffic:"all",severity:"all",
+  autoRefresh:false,comparePrev:false,
+  monthlyCost:15.00,detailCost:15.00,jitter:0,
+  botSearch:"",botFilter:"all",
+  logSearch:"",logStatus:"all",logUA:"all"
+};
+const RANGE_FACTOR={"15m":0.011,"1h":0.045,"6h":0.26,"24h":1,"7d":6.8};
+const RANGE_POINTS={"15m":10,"1h":12,"6h":12,"24h":12,"7d":14};
+const RANGE_LABELS={
+  "15m":["-15m","-13","-11","-9","-7","-5","-4","-3","-1","ahora"],
+  "1h":["-60m","-55","-50","-45","-40","-30","-25","-20","-15","-10","-5","ahora"],
+  "6h":["-6h","-5.5","-5","-4","-3.5","-3","-2.5","-2","-1.5","-1","-0.5","ahora"],
+  "24h":["-24h","-22","-20","-16","-12","-10","-8","-6","-4","-2","-1","ahora"],
+  "7d":["-7d","-6.5","-6","-5","-4.5","-4","-3","-2.5","-2","-1.5","-1","-0.5","-0.2","hoy"]
+};
+
+/* =========================================================================
+   HELPERS
+========================================================================= */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const fmt=n=>{n=Math.round(n);return n.toLocaleString("es-ES");};
+const fmt1=n=>n.toLocaleString("es-ES",{minimumFractionDigits:1,maximumFractionDigits:1});
+const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+function fmtBytes(bytes){
+  if(bytes==null||Number.isNaN(bytes))return "-";
+  const units=["B","KB","MB","GB","TB"];
+  let value=bytes,index=0;
+  while(value>=1024&&index<units.length-1){value/=1024;index++;}
+  return value.toFixed(value>=10||index===0?0:1)+" "+units[index];
+}
+function bytesToMb(bytes){return bytes?bytes/1024/1024:0;}
+function secondsAgo(iso){
+  if(!iso)return "hace 34s";
+  const diff=Math.max(0,Math.round((Date.now()-new Date(iso).getTime())/1000));
+  if(diff<60)return "hace "+diff+"s";
+  if(diff<3600)return "hace "+Math.round(diff/60)+"m";
+  return "hace "+Math.round(diff/3600)+"h";
+}
+function formatUptime(ms){
+  if(!ms||ms<0)return "n/d";
+  const sec=Math.floor(ms/1000),d=Math.floor(sec/86400),h=Math.floor(sec%86400/3600),m=Math.floor(sec%3600/60);
+  if(d>0)return d+"d "+h+"h";
+  if(h>0)return h+"h "+m+"m";
+  return Math.max(1,m)+"m";
+}
+function severityLevel(severity){return severity==="critical"?"crit":severity==="warn"?"warn":severity==="ok"?"ok":"info";}
+function serviceIdFromName(name){
+  const value=String(name||"").toLowerCase();
+  if(value==="app-souls"||value.includes("app-souls"))return "app-souls";
+  if(value.includes("openclaw"))return "openclaw";
+  if(value.includes("souls-monitor"))return "souls-monitor";
+  return null;
+}
+function serviceLevel(status){
+  return /online|running|active/i.test(status||"")?"ok":"crit";
+}
+function classifyRoute(route){
+  if(route.startsWith("/_next/image")||/\.(webp|png|jpe?g|gif|avif|svg)$/i.test(route))return "images";
+  if(route.startsWith("/api/"))return "api";
+  return "pages";
+}
+function riskFromRoute(route){
+  if(route.error5xx>0)return {risk:"crit",riskLabel:"Alto"};
+  if(route.error4xx>0)return {risk:"warn",riskLabel:"Medio"};
+  return {risk:"ok",riskLabel:"Bajo"};
+}
+function niceMax(v){if(v<=0)return 1;const e=Math.floor(Math.log10(v)),b=Math.pow(10,e),f=v/b;let nf;if(f<=1)nf=1;else if(f<=1.5)nf=1.5;else if(f<=2)nf=2;else if(f<=3)nf=3;else if(f<=5)nf=5;else nf=10;return nf*b;}
+function seeded(i,salt){const x=Math.sin((i+1)*12.9898+salt*78.233+state.jitter*0.017)*43758.5453;return x-Math.floor(x);}
+function levelClass(l){return l==="ok"?"ok":l==="warn"?"warn":l==="crit"?"crit":"info";}
+function svgNode(str){const d=document.createElement("div");d.innerHTML=str;return d.firstElementChild;}
+
+/* factor aplicado por rango + tipo de tráfico */
+function activeFactor(){
+  let f=RANGE_FACTOR[state.timeRange];
+  if(state.traffic==="images")f*=0.55;
+  else if(state.traffic==="pages")f*=0.7;
+  else if(state.traffic==="api")f*=0.3;
+  else if(state.traffic==="bots")f*=0.22;
+  else if(state.traffic==="errors")f*=0.09;
+  return f;
+}
+/* servicios visibles según filtro */
+function visibleServices(){return state.service==="all"?SVC_ORDER:[state.service];}
+
+function applyOverview(data){
+  if(!data||!data.host)return;
+  liveSnapshot=data;
+  const totalMemory=data.host.memory?.totalBytes||0;
+  const usedMemory=data.host.memory?.usedBytes||0;
+  const mainDisk=(data.host.disks||[])[0];
+  const hasServiceRows=(data.services||[]).length>0;
+  HOST={
+    cpu:Number((data.host.loadAverage?.[0]||0).toFixed(2)),
+    ramPercent:data.host.memory?.usedPercent||0,
+    ramUsedMb:Math.round(bytesToMb(usedMemory)),
+    diskUsedGb:mainDisk?mainDisk.usedBytes/1024/1024/1024:HOST.diskUsedGb,
+    diskPercent:mainDisk?.usedPercent||HOST.diskPercent,
+    diskTotalGb:mainDisk?mainDisk.sizeBytes/1024/1024/1024:HOST.diskTotalGb,
+    activeServices:hasServiceRows?(data.services||[]).filter(s=>/online|running|active/i.test(s.status)).length:SVC_ORDER.filter(id=>SERVICES[id].level==="ok").length,
+    totalServices:hasServiceRows?(data.services||[]).length:SVC_ORDER.length,
+    generatedAt:data.host.generatedAt
+  };
+
+  const nextServices={...SERVICES};
+  for(const service of data.services||[]){
+    const id=serviceIdFromName(service.name);
+    if(!id||!nextServices[id])continue;
+    const current=nextServices[id];
+    const memMb=Math.round(bytesToMb(service.memoryBytes));
+    nextServices[id]={
+      ...current,
+      status:service.status||current.status,
+      level:serviceLevel(service.status),
+      runtime:service.kind==="pm2"?"PM2":service.kind==="docker"?"Docker":"systemd + Node.js",
+      mem:memMb||current.mem,
+      cpu:typeof service.cpuPercent==="number"&&Number.isFinite(service.cpuPercent)?Number(service.cpuPercent.toFixed(1)):current.cpu,
+      uptime:service.uptimeMs?formatUptime(service.uptimeMs):current.uptime,
+      restarts:service.restarts??current.restarts,
+      pid:service.pid??current.pid,
+      image:service.image||current.image
+    };
+  }
+
+  const statusCounts=data.nginx?.statusCounts||{};
+  const totalRequests=data.nginx?.totalRequests||SERVICES["app-souls"].requests;
+  const totalTransferMb=Math.round(bytesToMb(data.nginx?.totalBytes||0));
+  const totalErrors=Object.entries(statusCounts).filter(([code])=>/^[45]/.test(code)).reduce((sum,[,count])=>sum+Number(count||0),0);
+  nextServices["app-souls"]={
+    ...nextServices["app-souls"],
+    requests:totalRequests,
+    transfer:totalTransferMb||nextServices["app-souls"].transfer,
+    errorRate:totalRequests?Number((totalErrors/totalRequests*100).toFixed(2)):nextServices["app-souls"].errorRate
+  };
+
+  const alertCounts={};
+  for(const id of SVC_ORDER)alertCounts[id]={warn:0,crit:0};
+  for(const alert of data.alerts||[]){
+    const text=((alert.title||"")+" "+(alert.message||"")).toLowerCase();
+    const id=text.includes("openclaw")?"openclaw":text.includes("monitor")||text.includes("sospechoso")?"souls-monitor":"app-souls";
+    if(alert.severity==="critical")alertCounts[id].crit++;
+    else if(alert.severity==="warn")alertCounts[id].warn++;
+  }
+  for(const id of SVC_ORDER){
+    nextServices[id].alertsW=alertCounts[id].warn;
+    nextServices[id].alertsC=alertCounts[id].crit;
+  }
+  SERVICES=nextServices;
+
+  if(data.nginx?.topRoutes?.length){
+    TOP_ROUTES=data.nginx.topRoutes.slice(0,8).map(route=>{
+      const risk=riskFromRoute(route);
+      return {
+        route:route.route,
+        transfer:Math.max(0.1,Number(bytesToMb(route.bytes).toFixed(1))),
+        requests:route.requests,
+        ...risk,
+        highlight:route.route==="/_next/image"||route.route==="/boveda",
+        type:classifyRoute(route.route)
+      };
+    });
+  }
+
+  if(data.nginx?.suspiciousUserAgents?.length){
+    BOTS=data.nginx.suspiciousUserAgents.map(item=>{
+      const ua=item.userAgent||"unknown";
+      const known=/googlebot|bingbot/i.test(ua);
+      return {
+        ua,
+        type:known?"bot":"susp",
+        requests:item.requests,
+        last:"ventana actual",
+        action:known?"Permitir":item.requests>100?"Bloquear":"Revisar"
+      };
+    });
+  }
+
+  if(data.storage?.paths?.length){
+    const totalStorage=(mainDisk?.sizeBytes||80*1024*1024*1024);
+    STORAGE=data.storage.paths.map(item=>{
+      const id=item.path.includes("openclaw")?"openclaw":item.path.includes("souls-monitor")?"souls-monitor":"app-souls";
+      const pct=item.bytes?clamp(item.bytes/totalStorage*100,1,100):0;
+      const warn=item.path.includes("/var/log")&&item.bytes>1024*1024*1024;
+      return {
+        path:item.path,
+        svc:id,
+        size:fmtBytes(item.bytes),
+        pct:Math.round(pct),
+        growth:"n/d",
+        risk:warn?"warn":"ok",
+        riskLabel:warn?"Medio":"Bajo",
+        rec:warn?"Revisar logrotate":"Sin acción"
+      };
+    });
+  }
+
+  if(data.alerts?.length){
+    ALERTS=data.alerts.map((alert,index)=>{
+      const text=((alert.title||"")+" "+(alert.message||"")).toLowerCase();
+      const svc=text.includes("openclaw")?"openclaw":text.includes("monitor")||text.includes("sospechoso")?"souls-monitor":"app-souls";
+      return {
+        level:severityLevel(alert.severity),
+        time:index===0?"ahora":"-"+(index*4)+"m",
+        svc,
+        msg:(alert.title||"Alerta")+": "+(alert.message||"")
+      };
+    });
+  }
+
+  const last=secondsAgo(data.host.generatedAt);
+  $("#lastUpdate").textContent=last;
+  tick=Math.max(0,Math.round((Date.now()-new Date(data.host.generatedAt).getTime())/1000));
+}
+
+async function loadOverview(){
+  try{
+    const response=await fetch("/api/overview",{cache:"no-store"});
+    if(!response.ok)throw new Error("HTTP "+response.status);
+    const data=await response.json();
+    applyOverview(data);
+  }catch(error){
+    console.warn("Usando datos mock: no se pudo leer /api/overview",error);
+  }
+}
+
+/* =========================================================================
+   GRÁFICAS SVG
+========================================================================= */
+/* ---- Line/Area chart (dual axis) con tooltip ---- */
+function lineAreaChart(el,series,xLabels,opts={}){
+  const W=760,H=290,P={t:16,r:opts.dualAxis?52:20,b:30,l:opts.leftPad||46};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b, n=xLabels.length;
+  const maxL=niceMax(Math.max(1,...series.filter(s=>s.axis!=="right").flatMap(s=>s.data)));
+  const rSeries=series.filter(s=>s.axis==="right");
+  const maxR=rSeries.length?niceMax(Math.max(1,...rSeries.flatMap(s=>s.data))):maxL;
+  const x=i=>P.l+iw*(n===1?0:i/(n-1));
+  const yL=v=>P.t+ih*(1-v/maxL);
+  const yR=v=>P.t+ih*(1-v/maxR);
+  let s='<svg viewBox="0 0 '+W+' '+H+'" role="img">';
+  s+='<defs>';
+  series.forEach((se,k)=>{s+='<linearGradient id="lg'+k+opts.id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+se.color+'" stop-opacity="'+(se.fill===false?0:0.22)+'"/><stop offset="100%" stop-color="'+se.color+'" stop-opacity="0"/></linearGradient>';});
+  s+='</defs>';
+  // grid + y ticks (left)
+  for(let g=0;g<=4;g++){const yy=P.t+ih*g/4;s+='<line x1="'+P.l+'" y1="'+yy+'" x2="'+(W-P.r)+'" y2="'+yy+'" stroke="'+C.bd+'" stroke-width="1"/>';
+    s+='<text x="'+(P.l-8)+'" y="'+(yy+4)+'" text-anchor="end" font-size="10" fill="'+C.faint+'">'+fmt(maxL*(1-g/4))+'</text>';
+    if(opts.dualAxis)s+='<text x="'+(W-P.r+8)+'" y="'+(yy+4)+'" text-anchor="start" font-size="10" fill="'+C.faint+'">'+fmt(maxR*(1-g/4))+'</text>';}
+  // x labels
+  xLabels.forEach((lb,i)=>{if(n>8&&i%2!==0&&i!==n-1)return;s+='<text x="'+x(i)+'" y="'+(H-10)+'" text-anchor="middle" font-size="10" fill="'+C.faint+'">'+lb+'</text>';});
+  // series
+  series.forEach((se,k)=>{
+    const yf=se.axis==="right"?yR:yL;
+    let d="",a="";
+    se.data.forEach((v,i)=>{const px=x(i),py=yf(v);d+=(i?" L":"M")+px+" "+py;});
+    a=d+" L"+x(n-1)+" "+(P.t+ih)+" L"+x(0)+" "+(P.t+ih)+" Z";
+    if(se.fill!==false)s+='<path d="'+a+'" fill="url(#lg'+k+opts.id+')"/>';
+    s+='<path d="'+d+'" fill="none" stroke="'+se.color+'" stroke-width="'+(se.dash?1.6:2.4)+'" '+(se.dash?'stroke-dasharray="5 4" opacity="0.7"':'')+' stroke-linejoin="round" stroke-linecap="round"/>';
+    if(!se.dash)se.data.forEach((v,i)=>{s+='<circle cx="'+x(i)+'" cy="'+yf(v)+'" r="2.6" fill="#fff" stroke="'+se.color+'" stroke-width="1.6"/>';});
+  });
+  // guide line + hit bands
+  s+='<line id="gd'+opts.id+'" x1="0" y1="'+P.t+'" x2="0" y2="'+(P.t+ih)+'" stroke="'+C.purpleSoft+'" stroke-width="1.5" opacity="0"/>';
+  for(let i=0;i<n;i++){const bx=x(i)-(iw/n/2);s+='<rect class="hb" data-i="'+i+'" x="'+Math.max(P.l,bx)+'" y="'+P.t+'" width="'+(iw/n)+'" height="'+ih+'" fill="transparent"/>';}
+  s+='</svg>';
+  el.innerHTML=s+'<div class="tooltip" id="tt'+opts.id+'"></div>';
+  // interactions
+  const svg=el.querySelector("svg"),gd=el.querySelector("#gd"+opts.id),tt=el.querySelector("#tt"+opts.id);
+  el.querySelectorAll(".hb").forEach(b=>{
+    b.addEventListener("mouseenter",()=>{
+      const i=+b.dataset.i, gx=x(i);
+      gd.setAttribute("x1",gx);gd.setAttribute("x2",gx);gd.setAttribute("opacity","1");
+      let html='<div class="tt-t">'+xLabels[i]+'</div>';
+      series.filter(se=>!se.dash).forEach(se=>{html+='<div class="tt-r"><span class="sw" style="background:'+se.color+'"></span>'+se.name+'<span class="v">'+fmt(se.data[i])+(se.unit||"")+'</span></div>';});
+      tt.innerHTML=html;
+      const rect=svg.getBoundingClientRect();
+      tt.style.left=(gx/W*rect.width)+"px";
+      tt.style.top=(P.t/H*rect.height+18)+"px";
+      tt.style.opacity="1";
+    });
+    b.addEventListener("mouseleave",()=>{tt.style.opacity="0";gd.setAttribute("opacity","0");});
+  });
+}
+
+/* ---- Grouped vertical bars ---- */
+function groupedBars(el,groups,seriesDefs,opts={}){
+  const W=760,H=290,P={t:16,r:16,b:44,l:40};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b, ng=groups.length, nb=seriesDefs.length;
+  const max=niceMax(Math.max(1,...groups.flatMap(g=>g.values)));
+  const gw=iw/ng, bw=Math.min(26,(gw*0.62)/nb), gap=(gw-bw*nb)/2;
+  const y=v=>P.t+ih*(1-v/max);
+  let s='<svg viewBox="0 0 '+W+' '+H+'">';
+  for(let g=0;g<=4;g++){const yy=P.t+ih*g/4;s+='<line x1="'+P.l+'" y1="'+yy+'" x2="'+(W-P.r)+'" y2="'+yy+'" stroke="'+C.bd+'"/>';s+='<text x="'+(P.l-8)+'" y="'+(yy+4)+'" text-anchor="end" font-size="10" fill="'+C.faint+'">'+fmt(max*(1-g/4))+'</text>';}
+  groups.forEach((grp,gi)=>{
+    const gx=P.l+gw*gi;
+    grp.values.forEach((v,bi)=>{
+      const bx=gx+gap+bi*bw, by=y(v), bh=P.t+ih-by;
+      s+='<rect x="'+bx+'" y="'+by+'" width="'+(bw-4)+'" height="'+Math.max(0,bh)+'" rx="3" fill="'+seriesDefs[bi].color+'"><title>'+grp.label+' · '+seriesDefs[bi].name+': '+grp.raw[bi]+'</title></rect>';
+    });
+    s+='<text x="'+(gx+gw/2)+'" y="'+(H-24)+'" text-anchor="middle" font-size="11" font-weight="600" fill="'+C.muted+'">'+grp.label+'</text>';
+  });
+  s+='</svg>';el.innerHTML=s;
+}
+
+/* ---- Horizontal bars ---- */
+function horizontalBars(el,items,opts={}){
+  const rowH=46,W=760,P={t:8,r:16,b:8,l:150};
+  const H=P.t+P.b+items.length*rowH, iw=W-P.l-P.r;
+  const max=niceMax(Math.max(1,...items.map(i=>i.value)));
+  const x=v=>iw*v/max;
+  let s='<svg viewBox="0 0 '+W+' '+H+'">';
+  items.forEach((it,i)=>{
+    const y=P.t+i*rowH+8, bw=x(it.value), col=it.highlight?C.purple:C.purpleSoft;
+    s+='<rect x="'+P.l+'" y="'+y+'" width="'+iw+'" height="18" rx="4" fill="'+C.tableHead+'"/>';
+    s+='<rect x="'+P.l+'" y="'+y+'" width="'+Math.max(3,bw)+'" height="18" rx="4" fill="'+col+'"><title>'+it.label+': '+it.value+' MB</title></rect>';
+    s+='<text x="'+(P.l-10)+'" y="'+(y+9)+'" text-anchor="end" font-size="12" font-weight="'+(it.highlight?700:600)+'" fill="'+(it.highlight?C.purple:C.muted)+'" font-family="ui-monospace,Menlo,monospace">'+it.label+'</text>';
+    s+='<text x="'+(P.l+Math.max(3,bw)+8)+'" y="'+(y+9)+'" font-size="11.5" font-weight="700" fill="'+C.muted+'">'+it.value+' MB</text>';
+    s+='<text x="'+(P.l-10)+'" y="'+(y+26)+'" text-anchor="end" font-size="10.5" fill="'+C.faint+'">'+fmt(it.sub)+' req · '+it.pct+'%</text>';
+  });
+  s+='</svg>';el.innerHTML=s;
+}
+
+/* ---- Stacked vertical bars ---- */
+function stackedBars(el,cats,seriesDefs){
+  const W=760,H=280,P={t:16,r:16,b:34,l:40};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b, n=cats.length;
+  const totals=cats.map(c=>c.values.reduce((a,b)=>a+b,0));
+  const max=niceMax(Math.max(1,...totals));
+  const gw=iw/n, bw=Math.min(38,gw*0.55);
+  const y=v=>ih*v/max;
+  let s='<svg viewBox="0 0 '+W+' '+H+'">';
+  for(let g=0;g<=4;g++){const yy=P.t+ih*g/4;s+='<line x1="'+P.l+'" y1="'+yy+'" x2="'+(W-P.r)+'" y2="'+yy+'" stroke="'+C.bd+'"/>';s+='<text x="'+(P.l-8)+'" y="'+(yy+4)+'" text-anchor="end" font-size="10" fill="'+C.faint+'">'+fmt(max*(1-g/4))+'</text>';}
+  cats.forEach((cat,ci)=>{
+    const cx=P.l+gw*ci+(gw-bw)/2; let acc=0;
+    cat.values.forEach((v,si)=>{
+      const bh=y(v), by=P.t+ih-y(acc)-bh;
+      const r=si===cat.values.length-1?"3":"0";
+      s+='<rect x="'+cx+'" y="'+by+'" width="'+bw+'" height="'+Math.max(0,bh)+'" fill="'+seriesDefs[si].color+'" rx="'+r+'"><title>'+cat.label+' · '+seriesDefs[si].name+': '+v+'</title></rect>';
+      acc+=v;
+    });
+    s+='<text x="'+(cx+bw/2)+'" y="'+(H-14)+'" text-anchor="middle" font-size="10.5" fill="'+C.muted+'">'+cat.label+'</text>';
+  });
+  s+='</svg>';el.innerHTML=s;
+}
+
+/* ---- Donut chart ---- */
+function donutChart(el,segments,opts={}){
+  const size=180,cx=size/2,cy=size/2,r=68,sw=26,cir=2*Math.PI*r;
+  const total=segments.reduce((a,b)=>a+b.value,0)||1;
+  let off=0,s='<div class="donut-wrap"><div style="flex:0 0 '+size+'px"><svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'">';
+  s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+C.tableHead+'" stroke-width="'+sw+'"/>';
+  segments.forEach(seg=>{
+    const frac=seg.value/total, len=frac*cir;
+    s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+seg.color+'" stroke-width="'+sw+'" stroke-dasharray="'+len+' '+(cir-len)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 '+cx+' '+cy+')" stroke-linecap="butt"><title>'+seg.name+': '+Math.round(frac*100)+'%</title></circle>';
+    off+=len;
+  });
+  s+='<text x="'+cx+'" y="'+(cy-4)+'" text-anchor="middle" font-size="24" font-weight="800" fill="#111827">'+(opts.centerTop||fmt(total))+'</text>';
+  s+='<text x="'+cx+'" y="'+(cy+16)+'" text-anchor="middle" font-size="10.5" fill="'+C.muted+'">'+(opts.centerBottom||"total")+'</text>';
+  s+='</svg></div><div class="donut-legend">';
+  segments.forEach(seg=>{const pc=Math.round(seg.value/total*100);
+    s+='<div class="dl"><span class="sw" style="background:'+seg.color+'"></span><span class="nm">'+seg.name+'</span><span class="pc">'+pc+'%</span>'+(seg.count!=null?'<span class="ct">· '+fmt(seg.count)+'</span>':'')+'</div>';});
+  s+='</div></div>';
+  el.innerHTML=s;
+}
+
+/* =========================================================================
+   RENDER · VISTA GENERAL
+========================================================================= */
+function renderKpis(){
+  const f=activeFactor(), j=state.jitter, prev=state.comparePrev;
+  const req=SVC_ORDER.filter(s=>state.service==="all"||s===state.service).reduce((a,s)=>a+SERVICES[s].requests,0);
+  const tr=SVC_ORDER.filter(s=>state.service==="all"||s===state.service).reduce((a,s)=>a+SERVICES[s].transfer,0);
+  const cpu=(state.service==="all"?HOST.cpu:SERVICES[state.service].cpu)+seeded(1,j)*0.6-0.3;
+  const ramMB=state.service==="all"?HOST.ramUsedMb:SERVICES[state.service].mem;
+  const err=(state.service==="all"?0.7:SERVICES[state.service].errorRate)+seeded(2,j)*0.15;
+  const five=Math.max(0,Math.round((state.service==="app-souls"||state.service==="all"?23:1)*Math.min(1,RANGE_FACTOR[state.timeRange]/RANGE_FACTOR["1h"])+seeded(5,j)*3));
+  const kpis=[
+    {lbl:"Transferencia 24h",val:fmt(tr*f)+" ",unit:"MB",st:"ok",d:"+8.4%",dir:"up",ic:'<path d="M12 19V6M5 12l7-7 7 7"/>'},
+    {lbl:"Requests 24h",val:fmt(req*f),unit:"",st:"ok",d:"+3.1%",dir:"up",ic:'<path d="M3 12h4l3 8 4-16 3 8h4"/>'},
+    {lbl:"Error rate",val:fmt1(err)+"%",unit:"",st:err>0.6?"warn":"ok",d:"+0.2pp",dir:"up",bad:true,ic:'<path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>'},
+    {lbl:"5xx últimos 60m",val:fmt(five),unit:"",st:five>10?"crit":five>3?"warn":"ok",d:"+"+Math.round(five*0.8),dir:"up",bad:true,ic:'<path d="M18 6 6 18M6 6l12 12"/>'},
+    {lbl:"CPU VPS",val:fmt1(Math.max(0,cpu))+"%",unit:"",st:cpu>70?"crit":cpu>45?"warn":"ok",d:"-1.2pp",dir:"down",ic:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>'},
+    {lbl:"RAM VPS",val:(ramMB/1024).toFixed(2)+" ",unit:"GB",st:HOST.ramPercent>85?"crit":HOST.ramPercent>75?"warn":"ok",d:fmt1(HOST.ramPercent)+"%",dir:"up",ic:'<rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 7V5M12 7V5M17 7V5M7 21v-2M17 21v-2"/>'},
+    {lbl:"Disco usado",val:fmt1(HOST.diskUsedGb)+" ",unit:"GB",st:HOST.diskPercent>90?"crit":HOST.diskPercent>75?"warn":"ok",d:fmt1(HOST.diskPercent)+"%",dir:"up",ic:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/>'},
+    {lbl:"Servicios activos",val:(state.service==="all"?HOST.activeServices+"/"+HOST.totalServices:"1/1"),unit:"",st:HOST.activeServices>=HOST.totalServices?"ok":"crit",d:"estable",dir:"flat",ic:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'}
+  ];
+  $("#g-kpis").innerHTML=kpis.map(k=>{
+    const dcls=k.dir==="up"?(k.bad?"up bad":"up"):k.dir==="down"?"down":"flat";
+    const arrow=k.dir==="up"?"▲":k.dir==="down"?"▼":"■";
+    return '<div class="kpi"><div class="top"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+k.ic+'</svg></div><span class="lbl">'+k.lbl+'</span><span class="st '+k.st+'"></span></div>'+
+      '<div class="val">'+k.val+'<small>'+k.unit+'</small></div>'+
+      (prev?'<span class="delta '+dcls+'">'+arrow+' '+k.d+' <span style="opacity:.7;font-weight:600">vs ant.</span></span>':'<span class="delta '+dcls+'">'+arrow+' '+k.d+'</span>')+
+      '</div>';
+  }).join("");
+}
+
+function renderServices(){
+  const vis=visibleServices();
+  const active=vis.filter(id=>SERVICES[id].level==="ok").length;
+  $("#svcActiveCount").textContent=active+"/"+vis.length;
+  $("#g-services").innerHTML=vis.map(id=>{
+    const s=SERVICES[id];
+    const alertsHtml=(s.alertsC>0?'<span class="badge crit"><span class="led"></span> '+s.alertsC+' crit</span>':'')+
+      (s.alertsW>0?' <span class="badge warn"><span class="led"></span> '+s.alertsW+' warn</span>':'')||'<span class="badge ok"><span class="led"></span> Sin alertas</span>';
+    return '<div class="svc" data-open="'+id+'">'+
+      '<div class="svc-top"><div class="svc-ic '+s.icon+'">'+svcIcon(id)+'</div>'+
+      '<div><h3>'+s.name+'</h3><div class="rt">'+s.runtime+' · '+s.port+'</div></div>'+
+      '<span class="badge-st badge '+levelClass(s.level)+'"><span class="led"></span> '+s.status+'</span></div>'+
+      '<div class="metrics">'+
+        '<div class="metric"><span class="m-l">CPU</span><span class="m-v">'+s.cpu+'%</span></div>'+
+        '<div class="metric"><span class="m-l">RAM</span><span class="m-v">'+s.mem+' MB</span></div>'+
+        '<div class="metric"><span class="m-l">Uptime</span><span class="m-v">'+s.uptime+'</span></div>'+
+        '<div class="metric"><span class="m-l">Puerto</span><span class="m-v mono" style="font-size:12px">'+s.port+'</span></div>'+
+      '</div>'+
+      '<div class="svc-foot"><span class="alerts-mini">'+alertsHtml+'</span><span class="see">Ver detalle <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span></div>'+
+    '</div>';
+  }).join("");
+  $$("#g-services .svc").forEach(c=>c.addEventListener("click",()=>openDetail(c.dataset.open)));
+}
+function svcIcon(id){
+  if(id==="app-souls")return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>';
+  if(id==="openclaw")return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 8-6-16-3 8H2"/></svg>';
+  return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+}
+
+function renderTrafficChart(){
+  const f=activeFactor(),n=RANGE_POINTS[state.timeRange],labels=RANGE_LABELS[state.timeRange].slice(0,n);
+  const reqBase=1550*f, trBase=42*f;
+  const reqData=[],trData=[],reqPrev=[];
+  for(let i=0;i<n;i++){const w=0.6+0.8*seeded(i,1)+ (i/n)*0.5;
+    reqData.push(Math.round(reqBase*w));trData.push(Math.round(trBase*w*(0.8+0.5*seeded(i,7))));
+    reqPrev.push(Math.round(reqBase*w*(0.82+0.2*seeded(i,3))));}
+  const series=[
+    {name:"Requests",color:C.purple,data:reqData,axis:"left"},
+    {name:"MB transferidos",color:C.gold,data:trData,axis:"right",unit:" MB"}
+  ];
+  if(state.comparePrev){series.push({name:"Requests (ant.)",color:C.bdStrong,data:reqPrev,axis:"left",dash:true,fill:false});$("#trafficCompareLi").style.display="";}
+  else $("#trafficCompareLi").style.display="none";
+  lineAreaChart($("#chart-traffic"),series,labels,{id:"traffic",dualAxis:true});
+}
+
+function renderResourcesChart(){
+  const groups=visibleServices().map(id=>{const s=SERVICES[id];
+    // normalizado: CPU %, RAM (MB/10), Transfer (MB/6)
+    return {label:s.name,values:[s.cpu,s.mem/10,s.transfer/6],raw:[s.cpu+"%",s.mem+" MB",s.transfer+" MB"]};});
+  groupedBars($("#chart-resources"),groups,[{name:"CPU %",color:C.purple},{name:"RAM",color:C.gold},{name:"Transfer",color:C.purpleDeep}]);
+}
+
+function renderRoutesChart(){
+  let routes=TOP_ROUTES.slice();
+  if(state.traffic==="images")routes=routes.filter(r=>r.type==="images"||r.highlight);
+  else if(state.traffic==="pages")routes=routes.filter(r=>r.type==="pages");
+  $("#routesFilterNote").textContent=state.traffic==="all"?"todos":state.traffic;
+  const total=routes.reduce((a,r)=>a+r.transfer,0)||1;
+  const items=routes.map(r=>({label:r.route,value:Math.round(r.transfer*activeFactor()/activeFactor()),sub:r.requests,pct:Math.round(r.transfer/total*100),highlight:r.highlight}));
+  if(!items.length){$("#chart-routes").innerHTML=emptyState("Sin rutas para este filtro");return;}
+  horizontalBars($("#chart-routes"),items,{});
+}
+
+function renderErrors(){
+  const f=Math.min(1.3,RANGE_FACTOR[state.timeRange]/RANGE_FACTOR["1h"]);
+  const counts=liveSnapshot?.nginx?.statusCounts||{};
+  const group=(prefix,fallback)=>Object.entries(counts).filter(([code])=>code.startsWith(prefix)).reduce((sum,[,count])=>sum+Number(count||0),0)||fallback;
+  const c2=group("2",Math.round(14210*activeFactor()));
+  const c3=group("3",Math.round(890*activeFactor()));
+  const c4=group("4",Math.round(310*activeFactor()));
+  const c5=Math.max(0,group("5",Math.round(23*f+seeded(9,state.jitter)*4)));
+  $("#err-kpis").innerHTML=[
+    {k:"Total requests",v:fmt(c2+c3+c4+c5)},
+    {k:"4xx",v:fmt(c4),s:"warn"},
+    {k:"5xx",v:fmt(c5),s:"crit"},
+    {k:"Error rate",v:(((c4+c5)/Math.max(1,c2+c3+c4+c5))*100).toFixed(2)+"%",s:"warn"}
+  ].map(m=>'<div class="mini"><div class="k">'+m.k+'</div><div class="v" '+(m.s?'style="color:var(--'+m.s+')"':'')+'>'+m.v+'</div></div>').join("");
+  $("#err-chips").innerHTML=[
+    {l:"2xx",v:c2,c:"ok"},{l:"3xx",v:c3,c:"info"},{l:"4xx",v:c4,c:"warn"},{l:"5xx",v:c5,c:"crit"}
+  ].map(x=>'<span class="chip"><span class="badge '+x.c+'"><span class="led"></span>'+x.l+'</span> <b>'+fmt(x.v)+'</b></span>').join("");
+  const eps=(liveSnapshot?.nginx?.topRoutes||[])
+    .filter(route=>route.error4xx||route.error5xx)
+    .slice(0,5)
+    .map(route=>({r:route.route,c:(route.error4xx||0)+(route.error5xx||0),s:route.error5xx?"crit":"warn"}));
+  if(!eps.length)eps.push(
+    {r:"/boveda/:slug",c:9,s:"crit"},{r:"/_next/image",c:6,s:"crit"},{r:"/api/cartas",c:4,s:"warn"},
+    {r:"/api/laboratorio",c:2,s:"warn"},{r:"/boveda",c:1,s:"warn"}
+  );
+  $("#err-endpoints").innerHTML=eps.map(e=>'<div class="ep"><span class="badge '+e.s+'"><span class="led"></span></span><span class="rt">'+e.r+'</span><span class="ct" style="color:var(--'+e.s+')">'+e.c+' err</span></div>').join("");
+  // matrix
+  const hours=24;let m="";
+  visibleServices().forEach((id,si)=>{const s=SERVICES[id];let cells="";
+    for(let h=0;h<hours;h++){const rnd=seeded(h*3+si*7,state.jitter);let cls="";
+      if(id==="app-souls"&&(h===h && rnd>0.86))cls="crit";else if(rnd>0.9)cls="warn";else if(rnd>0.82)cls="warn";
+      if(state.severity==="ok"&&cls)cls="idle";
+      if(state.severity==="crit"&&cls!=="crit")cls=cls==="warn"?"idle":cls;
+      cells+='<div class="cell '+cls+'" title="'+s.name+' · h-'+(hours-h)+'"></div>';}
+    m+='<div class="mrow"><span class="mname">'+s.name+'</span><div class="cells">'+cells+'</div></div>';});
+  m+='<div class="axis"><span>-24h</span><span>-18h</span><span>-12h</span><span>-6h</span><span>ahora</span></div>';
+  $("#err-matrix").innerHTML=m;
+}
+
+function renderComposition(){
+  const f=activeFactor();
+  let real=68,bot=22,susp=10;
+  if(state.traffic==="bots"){real=8;bot=70;susp=22;}
+  else if(state.traffic==="errors"){real=40;bot=18;susp=42;}
+  const totalReq=Math.round(19270*f);
+  donutChart($("#chart-composition"),[
+    {name:"Usuarios reales",color:C.purple,value:real,count:Math.round(totalReq*real/100)},
+    {name:"Bots conocidos",color:C.gold,value:bot,count:Math.round(totalReq*bot/100)},
+    {name:"Sospechosos",color:C.crit,value:susp,count:Math.round(totalReq*susp/100)}
+  ],{centerTop:fmt(totalReq),centerBottom:"requests"});
+}
+
+function renderBotsTable(){
+  const q=state.botSearch.toLowerCase();
+  let rows=BOTS.filter(b=>b.ua.toLowerCase().includes(q));
+  if(state.botFilter==="bot")rows=rows.filter(b=>b.type==="bot");
+  else if(state.botFilter==="susp")rows=rows.filter(b=>b.type==="susp");
+  const tb=$("#bots-table tbody");
+  if(!rows.length){tb.innerHTML='<tr><td colspan="5">'+emptyState("Sin agentes que coincidan con el filtro")+'</td></tr>';return;}
+  tb.innerHTML=rows.map(b=>{
+    const typeBadge=b.type==="bot"?'<span class="badge info"><span class="led"></span> Bot conocido</span>':'<span class="badge crit"><span class="led"></span> Sospechoso</span>';
+    const act=b.action==="Bloquear"?'<span class="badge crit">'+b.action+'</span>':b.action==="Permitir"?'<span class="badge ok">'+b.action+'</span>':'<span class="badge warn">'+b.action+'</span>';
+    return '<tr><td class="mono">'+b.ua+'</td><td>'+typeBadge+'</td><td class="num">'+fmt(b.requests)+'</td><td style="color:var(--muted)">'+b.last+'</td><td>'+act+'</td></tr>';
+  }).join("");
+}
+
+function renderCosts(){
+  const cost=state.monthlyCost;
+  const meters=SVC_ORDER.map(id=>{const s=SERVICES[id];const c=cost*s.costShare/100;
+    const col=id==="app-souls"?C.purple:id==="openclaw"?C.gold:C.info;
+    return '<div class="meter"><div class="mt-top"><span class="nm">'+s.name+'</span><span class="pc">'+s.costShare+'%</span><span class="cost">€'+c.toFixed(2)+'</span></div>'+
+      '<div class="track"><div class="fill" style="width:'+s.costShare+'%;background:'+col+'"></div></div></div>';}).join("");
+  $("#cost-meters").innerHTML=meters;
+  const proj=cost<10?{l:"Bajo",c:"ok"}:cost<25?{l:"Medio",c:"warn"}:{l:"Alto",c:"crit"};
+  $("#projState").className="badge "+proj.c;$("#projState").innerHTML='<span class="led"></span> '+proj.l;
+}
+
+function renderAlerts(){
+  let a=ALERTS.slice();
+  if(state.severity!=="all")a=a.filter(x=>x.level===state.severity);
+  if(state.service!=="all")a=a.filter(x=>x.svc===state.service);
+  $("#alertsNote").textContent=a.length+" evento(s)";
+  if(!a.length){$("#g-alerts").innerHTML=emptyState("Sin alertas para el filtro seleccionado");return;}
+  $("#g-alerts").innerHTML=a.map(x=>{
+    const led="led-"+x.level;
+    return '<div class="tl"><div class="tick"><i class="'+led+'"></i></div><div class="body-tl">'+
+      '<div class="meta"><span class="badge '+x.level+'"><span class="led"></span> '+sevLabel(x.level)+'</span> <b>'+x.time+'</b> · '+SERVICES[x.svc].name+'</div>'+
+      '<div class="msg">'+x.msg+'</div></div></div>';
+  }).join("");
+}
+function sevLabel(l){return l==="ok"?"OK":l==="warn"?"Warning":l==="crit"?"Critical":"Info";}
+function emptyState(t){return '<div class="empty"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 14h8"/></svg><b>'+t+'</b><span>Ajusta los filtros para ver más datos</span></div>';}
+
+function renderGeneral(){
+  renderKpis();renderServices();renderTrafficChart();renderResourcesChart();
+  renderRoutesChart();renderErrors();renderComposition();renderBotsTable();renderCosts();renderAlerts();
+}
+
+/* =========================================================================
+   RENDER · VISTA DETALLE
+========================================================================= */
+function openDetail(id){state.detailService=id;state.view="detail";state.detailTab="performance";
+  $("#d-service").value=id;syncNav();showView();renderDetail();window.scrollTo({top:0,behavior:"smooth"});}
+
+function renderDetailHeader(){
+  const s=SERVICES[state.detailService];
+  $("#d-ic").className="d-ic svc-ic "+s.icon;$("#d-ic").innerHTML=svcIcon(state.detailService);
+  $("#d-name").textContent=s.name;
+  $("#d-meta").innerHTML='<span class="badge '+levelClass(s.level)+'"><span class="led"></span> '+s.status+'</span>'+
+    '<span class="badge purple"><span class="led"></span> '+s.runtime+'</span>'+
+    '<span class="badge neutral"><span class="led"></span> '+s.port+'</span>'+
+    (s.domain?'<span class="badge info"><span class="led"></span> '+s.domain+'</span>':'')+
+    (s.container?'<span class="badge neutral mono" style="font-size:11px"><span class="led"></span> '+s.container+'</span>':'');
+  $("#d-stats").innerHTML=[
+    {k:"Estado",v:s.status},{k:"Runtime",v:s.runtime},{k:"CPU",v:s.cpu+"%"},{k:"RAM",v:s.mem+" MB"},
+    {k:"Uptime",v:s.uptime},{k:"Error rate",v:s.errorRate+"%"}
+  ].map(x=>'<div class="stat"><div class="k">'+x.k+'</div><div class="v">'+x.v+'</div></div>').join("");
+}
+
+function renderDetail(){
+  renderDetailHeader();
+  $$("#d-tabs .tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===state.detailTab));
+  const p=$("#d-tabpanel");
+  const id=state.detailService,s=SERVICES[id];
+  if(state.detailTab==="performance")p.innerHTML=tabPerformance(id,s),afterPerf(id,s);
+  else if(state.detailTab==="trafico")p.innerHTML=tabTrafico(id,s),afterTrafico(id,s);
+  else if(state.detailTab==="logs")p.innerHTML=tabLogs(id,s),afterLogs(id,s);
+  else if(state.detailTab==="storage")p.innerHTML=tabStorage(id,s);
+  else if(state.detailTab==="costos")p.innerHTML=tabCostos(id,s),afterCostos(id,s);
+  else if(state.detailTab==="seguridad")p.innerHTML=tabSeguridad(id,s);
+}
+
+/* ---- Tab Performance ---- */
+function tabPerformance(id,s){
+  let runtimeTable="";
+  if(id==="app-souls")runtimeTable=rtTable(["PM2 name","PID","Restarts","Memory","CPU"],["app-souls",s.pid||"n/d",s.restarts??"n/d",s.mem+" MB",s.cpu+"%"]);
+  else if(id==="openclaw")runtimeTable=rtTable(["Container","Image","Restarts","Memory","CPU"],[s.container||"openclaw-hgga-openclaw-1",s.image||"openclaw-hgga-patched",s.restarts??"n/d",s.mem+" MB",s.cpu+"%"]);
+  else runtimeTable=rtTable(["systemd service","Collector timer","Metrics age","Memory","CPU"],["souls-monitor.service","souls-monitor-collector.timer (60s)",secondsAgo(HOST.generatedAt),s.mem+" MB",s.cpu+"%"]);
+  return '<div class="sec-block"><h3>CPU y RAM en el tiempo <span class="muted">· '+state.timeRange+'</span></h3>'+
+    '<div class="chartbox chart" id="chart-cpuram"></div>'+
+    '<div class="legend"><span class="li"><span class="sw line" style="background:'+C.purple+'"></span> CPU %</span><span class="li"><span class="sw line" style="background:'+C.gold+'"></span> RAM %</span></div></div>'+
+    '<div class="sec-block"><h3>Runtime</h3><div class="tbl-wrap">'+runtimeTable+'</div></div>'+
+    '<div class="sec-block"><h3>Red y disco <span class="muted">· indicadores</span></h3>'+
+    '<div class="kv">'+
+      kvItem("Network In",(id==="app-souls"?"12.4":id==="openclaw"?"3.1":"0.8")+" MB/s")+
+      kvItem("Network Out",(id==="app-souls"?"8.7":id==="openclaw"?"1.9":"0.4")+" MB/s")+
+      kvItem("Disk Read",(id==="app-souls"?"4.2":id==="openclaw"?"2.0":"0.3")+" MB/s")+
+      kvItem("Disk Write",(id==="app-souls"?"1.9":id==="openclaw"?"1.1":"0.2")+" MB/s")+
+      kvItem("Load avg (1m)",id==="app-souls"?"0.42":id==="openclaw"?"0.21":"0.06")+
+      kvItem("Threads",id==="app-souls"?"38":id==="openclaw"?"24":"9")+
+    '</div></div>';
+}
+function afterPerf(id,s){
+  const n=RANGE_POINTS[state.timeRange],labels=RANGE_LABELS[state.timeRange].slice(0,n);
+  const cpu=[],ram=[];const baseCpu=s.cpu,baseRam=s.mem/8000*100;// RAM % de 8GB aprox
+  for(let i=0;i<n;i++){cpu.push(Math.max(0.2,+(baseCpu*(0.7+0.6*seeded(i,11))).toFixed(1)));ram.push(Math.max(0.2,+((s.mem/1024/8*100)*(0.85+0.25*seeded(i,13))).toFixed(1)));}
+  lineAreaChart($("#chart-cpuram"),[
+    {name:"CPU %",color:C.purple,data:cpu,axis:"left",unit:"%"},
+    {name:"RAM %",color:C.gold,data:ram,axis:"left",unit:"%"}
+  ],labels,{id:"cpuram",dualAxis:false});
+}
+function rtTable(heads,vals){return '<table style="min-width:0"><thead><tr>'+heads.map(h=>'<th>'+h+'</th>').join("")+'</tr></thead><tbody><tr>'+vals.map((v,i)=>'<td class="'+(i===0?'mono':'')+'">'+v+'</td>').join("")+'</tr></tbody></table>';}
+function kvItem(k,v){return '<div class="item"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>';}
+
+/* ---- Tab Tráfico ---- */
+function tabTrafico(id,s){
+  let table="";
+  if(id==="app-souls"){
+    table='<div class="sec-block"><h3>Métricas de tráfico</h3><div class="kv">'+kvItem("Request rate","~"+fmt(Math.max(1,s.requests/1440))+" / min")+kvItem("Transferencia 24h",s.transfer+" MB")+kvItem("Rutas activas",TOP_ROUTES.length)+kvItem("Peak concurrencia",Math.max(8,Math.round(s.requests/210))+" req/s")+'</div></div>'+
+      '<div class="sec-block"><h3>Top endpoints</h3><div class="tbl-wrap"><table><thead><tr><th>Ruta</th><th class="num">Requests</th><th class="num">Transfer</th><th>Riesgo</th></tr></thead><tbody>'+
+      TOP_ROUTES.map(r=>'<tr><td class="mono">'+r.route+'</td><td class="num">'+fmt(r.requests)+'</td><td class="num">'+r.transfer+' MB</td><td><span class="badge '+r.risk+'"><span class="led"></span> '+r.riskLabel+'</span></td></tr>').join("")+'</tbody></table></div></div>';
+  }else if(id==="openclaw"){
+    table='<div class="sec-block"><h3>Estado de agentes</h3><div class="kv">'+
+      kvItem("Telegram default",'<span class="badge ok"><span class="led"></span> works</span>')+
+      kvItem("Telegram imagenes",'<span class="badge ok"><span class="led"></span> works</span>')+
+      kvItem("Mensajes procesados","1,284")+kvItem("Agent 'facturas'","412 calls")+kvItem("Agent 'imagenes'","318 calls")+kvItem("Polling status",'<span class="badge ok"><span class="led"></span> activo</span>')+'</div></div>'+
+      '<div class="sec-block"><h3>Errores de API</h3><div class="tbl-wrap"><table><thead><tr><th>Proveedor</th><th class="num">Llamadas</th><th class="num">Errores</th><th>Estado</th></tr></thead><tbody>'+
+      '<tr><td>Gemini</td><td class="num">412</td><td class="num">6</td><td><span class="badge warn"><span class="led"></span> 429 rate-limit</span></td></tr>'+
+      '<tr><td>OpenAI</td><td class="num">318</td><td class="num">0</td><td><span class="badge ok"><span class="led"></span> OK</span></td></tr>'+
+      '<tr><td>API interna</td><td class="num">554</td><td class="num">1</td><td><span class="badge ok"><span class="led"></span> OK</span></td></tr></tbody></table></div></div>';
+  }else{
+    table='<div class="sec-block"><h3>Dashboard y salud</h3><div class="kv">'+
+      kvItem("Requests dashboard","210")+kvItem("401 Basic Auth","37")+kvItem("Health checks","OK · cada 60s")+kvItem("metrics.json","actualizado hace 42s")+'</div></div>'+
+      '<div class="sec-block"><h3>Eventos recientes</h3><div class="tbl-wrap"><table><thead><tr><th>Evento</th><th class="num">Conteo</th><th>Estado</th></tr></thead><tbody>'+
+      '<tr><td>Actualizaciones metrics.json</td><td class="num">1,440</td><td><span class="badge ok"><span class="led"></span> OK</span></td></tr>'+
+      '<tr><td>401 por Basic Auth</td><td class="num">37</td><td><span class="badge warn"><span class="led"></span> Escaneos</span></td></tr>'+
+      '<tr><td>Health checks fallidos</td><td class="num">0</td><td><span class="badge ok"><span class="led"></span> OK</span></td></tr></tbody></table></div></div>';
+  }
+  return '<div class="sec-block"><h3>Status codes <span class="muted">· distribución por hora</span></h3><div class="chart" id="chart-status"></div>'+
+    '<div class="legend"><span class="li"><span class="sw" style="background:'+C.ok+'"></span> 2xx</span><span class="li"><span class="sw" style="background:'+C.info+'"></span> 3xx</span><span class="li"><span class="sw" style="background:'+C.warn+'"></span> 4xx</span><span class="li"><span class="sw" style="background:'+C.crit+'"></span> 5xx</span></div></div>'+table;
+}
+function afterTrafico(id,s){
+  const n=8;const cats=[];const base=id==="app-souls"?1:id==="openclaw"?0.5:0.25;
+  for(let i=0;i<n;i++){const scale=base*(60+seeded(i,17)*80);
+    cats.push({label:"h-"+(n-i),values:[
+      Math.round(scale*(0.9+0.1*seeded(i,1))),
+      Math.round(scale*0.06*seeded(i,2)),
+      Math.round(scale*0.12*seeded(i,3)),
+      id==="app-souls"?Math.round(scale*0.05*seeded(i,4)):Math.round(scale*0.01*seeded(i,4))
+    ]});}
+  stackedBars($("#chart-status"),cats,[{name:"2xx",color:C.ok},{name:"3xx",color:C.info},{name:"4xx",color:C.warn},{name:"5xx",color:C.crit}]);
+}
+
+/* ---- Tab Logs ---- */
+function tabLogs(id,s){
+  return '<div class="sec-block"><h3>Logs y errores <span class="muted">· '+s.name+'</span></h3>'+
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">'+
+      '<div class="searchbox"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg><input id="logSearch" placeholder="Buscar ruta o mensaje…" value="'+state.logSearch+'"></div>'+
+      '<select class="sel" id="logStatus"><option value="all">Status: Todos</option><option value="2">2xx</option><option value="3">3xx</option><option value="4">4xx</option><option value="5">5xx</option></select>'+
+      '<select class="sel" id="logUA"><option value="all">User-agent: Todos</option><option value="user">Usuarios</option><option value="bot">Bots conocidos</option><option value="susp">Sospechosos</option></select>'+
+    '</div>'+
+    '<div class="tbl-wrap"><table id="logs-table"><thead><tr><th>Hora</th><th>Servicio</th><th>Sev.</th><th>Mensaje</th><th class="num">Status</th><th>Ruta / evento</th><th>Origen</th></tr></thead><tbody></tbody></table></div></div>';
+}
+function afterLogs(id,s){
+  $("#logSearch").addEventListener("input",e=>{state.logSearch=e.target.value;fillLogs(id);});
+  $("#logStatus").value=state.logStatus;$("#logStatus").addEventListener("change",e=>{state.logStatus=e.target.value;fillLogs(id);});
+  $("#logUA").value=state.logUA;$("#logUA").addEventListener("change",e=>{state.logUA=e.target.value;fillLogs(id);});
+  fillLogs(id);
+}
+function uaClass(ua){
+  const susp=["zgrab","python-requests","curl","SiteChecker","Semrush","Ahrefs","Baidu"];
+  const bot=["Googlebot","Bingbot"];
+  if(bot.some(b=>ua.includes(b)))return "bot";
+  if(susp.some(b=>ua.includes(b)))return "susp";
+  return "user";
+}
+function fillLogs(id){
+  const q=state.logSearch.toLowerCase();
+  let rows=LOGS.filter(l=>l.svc===id);
+  rows=rows.filter(l=>l.msg.toLowerCase().includes(q)||l.route.toLowerCase().includes(q));
+  if(state.logStatus!=="all")rows=rows.filter(l=>String(l.status)[0]===state.logStatus);
+  if(state.logUA!=="all")rows=rows.filter(l=>uaClass(l.ua)===state.logUA);
+  if(state.severity!=="all")rows=rows.filter(l=>l.sev===state.severity);
+  const tb=$("#logs-table tbody");
+  if(!rows.length){tb.innerHTML='<tr><td colspan="7">'+emptyState("Sin logs que coincidan")+'</td></tr>';return;}
+  tb.innerHTML=rows.map(l=>{
+    const stColor=String(l.status)[0]==="5"?"crit":String(l.status)[0]==="4"?"warn":String(l.status)[0]==="3"?"info":"ok";
+    return '<tr><td class="mono" style="color:var(--muted)">'+l.time+'</td><td>'+SERVICES[l.svc].name+'</td>'+
+      '<td><span class="badge '+l.sev+'"><span class="led"></span> '+sevLabel(l.sev)+'</span></td>'+
+      '<td>'+l.msg+'</td><td class="num"><span class="badge '+stColor+'">'+l.status+'</span></td>'+
+      '<td class="mono">'+l.route+'</td><td class="mono" style="color:var(--muted)">'+l.ua+'</td></tr>';
+  }).join("");
+}
+
+/* ---- Tab Storage ---- */
+function tabStorage(id,s){
+  const rows=STORAGE.map(st=>{
+    const hl=st.svc===id?' style="background:var(--purple-lite)"':'';
+    return '<tr'+hl+'><td class="mono">'+st.path+(st.svc===id?' <span class="badge purple" style="margin-left:4px"><span class="led"></span> actual</span>':'')+'</td>'+
+      '<td style="min-width:150px"><div class="bar-cell"><div class="track"><div class="fill" style="width:'+st.pct+'%;background:'+(st.risk==="warn"?C.warn:C.purple)+'"></div></div><b>'+st.size+'</b></div></td>'+
+      '<td>'+st.growth+'</td><td><span class="badge '+st.risk+'"><span class="led"></span> '+st.riskLabel+'</span></td><td style="color:var(--muted)">'+st.rec+'</td></tr>';
+  }).join("");
+  return '<div class="sec-block"><h3>Almacenamiento por ruta <span class="muted">· medidores de ocupación</span></h3>'+
+    '<div class="tbl-wrap"><table><thead><tr><th>Ruta</th><th>Tamaño</th><th>Crecimiento 24h</th><th>Riesgo</th><th>Recomendación</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'+
+    '<div class="sec-block"><div class="note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>'+
+    '/var/log/nginx crece rápido (+420 MB/24h). Recomendado configurar logrotate para evitar saturar el disco.</div></div>';
+}
+
+/* ---- Tab Costos ---- */
+function tabCostos(id,s){
+  return '<div class="cols-2"><div class="sec-block"><h3>Participación estimada de costo</h3><div class="chart" id="chart-costdonut"></div></div>'+
+    '<div class="sec-block"><h3>Costo del servicio</h3>'+
+    '<div class="panel-title">Costo mensual VPS <span class="muted">· editable</span></div>'+
+    '<div class="cost-input" style="margin-bottom:14px"><span>€</span><input type="number" id="costDetail" value="'+state.detailCost.toFixed(2)+'" step="0.5" min="0"><span style="font-size:12px;color:var(--faint);font-weight:600">/ mes</span></div>'+
+    '<div class="kv" style="margin-bottom:14px">'+
+      kvItem("Share del servicio",s.costShare+"%")+
+      '<div class="item" style="background:var(--purple-lite);border-color:var(--bd-souls)"><div class="k">Costo estimado del servicio</div><div class="v" id="svcCostOut" style="color:var(--purple);font-size:20px">€'+(state.detailCost*s.costShare/100).toFixed(2)+'</div></div>'+
+    '</div>'+
+    '<div class="note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>Estimación orientativa, no facturación real de Contabo.</div>'+
+    '</div></div>';
+}
+function afterCostos(id,s){
+  donutChart($("#chart-costdonut"),COST_SHARES[id].map(x=>({name:x.k,value:x.v,color:x.c})),{centerTop:s.costShare+"%",centerBottom:"del total"});
+  const inp=$("#costDetail");
+  inp.addEventListener("input",e=>{const v=parseFloat(e.target.value)||0;state.detailCost=v;
+    $("#svcCostOut").textContent="€"+(v*s.costShare/100).toFixed(2);});
+}
+
+/* ---- Tab Seguridad ---- */
+function tabSeguridad(id,s){
+  const exposure=id==="app-souls"?{t:"Público",c:"warn",d:"Expuesto por Nginx + Cloudflare + HTTPS"}:
+    id==="openclaw"?{t:"Privado",c:"ok",d:"Solo accesible en 127.0.0.1 (sin exposición pública)"}:
+    {t:"Público protegido",c:"info",d:"HTTPS + Basic Auth en monitor.soulsinxtinction.com"};
+  const cert=id==="souls-monitor"?{dom:"monitor.soulsinxtinction.com",exp:"2026-09-14",days:74}:
+    id==="app-souls"?{dom:"soulsinxtinction.com",exp:"2026-09-14",days:74}:{dom:"— (sin dominio público)",exp:"n/a",days:null};
+  const events=[
+    {t:"Intentos a /.env",c:"crit",n:14,d:"Bloqueados por Basic Auth / 404"},
+    {t:"Intentos a /docker-compose.yml",c:"crit",n:8,d:"Bloqueados"},
+    {t:"Escaneo de bots sospechosos",c:"warn",n:9,d:"zgrab, python-requests, SemrushBot"}
+  ];
+  const recs=id==="app-souls"?[
+    {t:"WAF de Cloudflare activo",c:"ok",d:"Reglas de bots y rate-limit aplicadas."},
+    {t:"Revisar picos 5xx",c:"warn",d:"Correlacionar con transferencia de /_next/image."},
+    {t:"Rotación de logs",c:"warn",d:"Configurar logrotate en /var/log/nginx."}
+  ]:id==="openclaw"?[
+    {t:"Servicio no expuesto",c:"ok",d:"Correcto: solo binding local 127.0.0.1."},
+    {t:"Tokens Telegram/API",c:"warn",d:"Verificar rotación periódica de credenciales."}
+  ]:[
+    {t:"Basic Auth funcionando",c:"ok",d:"401 correctos ante escaneos automatizados."},
+    {t:"Bloquear IPs reincidentes",c:"warn",d:"Añadir fail2ban para /.env y /admin."}
+  ];
+  return '<div class="cols-2">'+
+    '<div class="sec-block"><h3>Estado de exposición</h3>'+
+      '<div class="rec"><span class="badge '+exposure.c+'"><span class="led"></span> '+exposure.t+'</span><div><div class="rec-t">'+s.name+'</div><div class="rec-d">'+exposure.d+'</div></div></div>'+
+      '<h3 style="margin-top:16px">Certificado TLS</h3>'+
+      '<div class="kv">'+kvItem("Dominio",'<span class="mono" style="font-size:12px">'+cert.dom+'</span>')+kvItem("Expiración",cert.exp)+
+        kvItem("Estado",cert.days===null?'<span class="badge neutral"><span class="led"></span> N/A</span>':'<span class="badge ok"><span class="led"></span> Válido · '+cert.days+' días</span>')+'</div>'+
+    '</div>'+
+    '<div class="sec-block"><h3>Eventos sospechosos</h3>'+
+      events.map(e=>'<div class="rec"><span class="badge '+e.c+'"><span class="led"></span> '+e.n+'</span><div><div class="rec-t">'+e.t+'</div><div class="rec-d">'+e.d+'</div></div></div>').join("")+
+    '</div>'+
+    '</div>'+
+    '<div class="sec-block"><h3>Recomendaciones</h3>'+
+      recs.map(r=>{const label=r.c==="ok"?"OK":r.c==="warn"?"Revisar":"Urgente";
+        return '<div class="rec"><span class="badge '+r.c+'"><span class="led"></span> '+label+'</span><div><div class="rec-t">'+r.t+'</div><div class="rec-d">'+r.d+'</div></div></div>';}).join("")+
+    '</div>';
+}
+
+/* =========================================================================
+   NAV / VIEW SWITCH
+========================================================================= */
+function showView(){
+  $("#view-general").classList.toggle("hidden",state.view!=="general");
+  $("#view-detail").classList.toggle("hidden",state.view!=="detail");
+}
+function syncNav(){
+  $$(".nav-item[data-nav]").forEach(n=>n.classList.toggle("active",n.dataset.nav===state.view));
+}
+function render(){showView();syncNav();if(state.view==="general")renderGeneral();else renderDetail();updateGlobalStatus();}
+
+function updateGlobalStatus(){
+  const hasCrit=ALERTS.some(a=>a.level==="crit");
+  const hasWarn=ALERTS.some(a=>a.level==="warn");
+  const pill=$("#globalStatus"),txt=$("#globalStatusText");
+  if(hasCrit){pill.className="pill critical";txt.textContent="Critical";}
+  else if(hasWarn){pill.className="pill warning";txt.textContent="Warning";}
+  else {pill.className="pill healthy";txt.textContent="Healthy";}
+}
+
+/* =========================================================================
+   EVENTOS
+========================================================================= */
+// nav vistas
+$$(".nav-item[data-nav]").forEach(n=>n.addEventListener("click",()=>{state.view=n.dataset.nav;render();closeSidebar();}));
+$$(".nav-item[data-svc]").forEach(n=>n.addEventListener("click",()=>{openDetail(n.dataset.svc);closeSidebar();}));
+// time range
+$$("#timeSeg button").forEach(b=>b.addEventListener("click",()=>{
+  $$("#timeSeg button").forEach(x=>x.classList.remove("active"));b.classList.add("active");
+  state.timeRange=b.dataset.t;render();}));
+// selects globales
+$("#fService").addEventListener("change",e=>{state.service=e.target.value;render();});
+$("#fTraffic").addEventListener("change",e=>{state.traffic=e.target.value;render();});
+$("#fSeverity").addEventListener("change",e=>{state.severity=e.target.value;render();});
+// toggles
+$("#autoRefresh").addEventListener("click",function(){state.autoRefresh=!state.autoRefresh;this.classList.toggle("on",state.autoRefresh);toggleAutoRefresh();});
+$("#comparePrev").addEventListener("click",function(){state.comparePrev=!state.comparePrev;this.classList.toggle("on",state.comparePrev);render();});
+// refresh
+$("#refreshBtn").addEventListener("click",doRefresh);
+async function doRefresh(){state.jitter++;const ic=$("#refreshIcon");ic.classList.add("spin");setTimeout(()=>ic.classList.remove("spin"),700);$("#lastUpdate").textContent="actualizando...";await loadOverview();render();}
+// detail
+$("#backBtn").addEventListener("click",()=>{state.view="general";render();window.scrollTo({top:0,behavior:"smooth"});});
+$("#d-service").addEventListener("change",e=>{state.detailService=e.target.value;renderDetail();});
+$$("#d-tabs .tab").forEach(t=>t.addEventListener("click",()=>{state.detailTab=t.dataset.tab;renderDetail();}));
+// costos general
+$("#costGeneral").addEventListener("input",e=>{state.monthlyCost=parseFloat(e.target.value)||0;renderCosts();});
+// bots filtros
+$("#botSearch").addEventListener("input",e=>{state.botSearch=e.target.value;renderBotsTable();});
+$("#botUA").addEventListener("change",e=>{state.botFilter=e.target.value;renderBotsTable();});
+// sidebar mobile
+$("#hamburger").addEventListener("click",()=>{$("#sidebar").classList.toggle("open");$("#scrim").classList.toggle("show");});
+$("#scrim").addEventListener("click",closeSidebar);
+function closeSidebar(){$("#sidebar").classList.remove("open");$("#scrim").classList.remove("show");}
+
+// auto-refresh timer + "hace Ns" contador
+let arTimer=null,tick=34;
+function toggleAutoRefresh(){if(state.autoRefresh){arTimer=setInterval(async()=>{state.jitter++;await loadOverview();render();},30000);}else{clearInterval(arTimer);arTimer=null;}}
+setInterval(()=>{tick++;$("#lastUpdate").textContent="hace "+tick+"s";},1000);
+
+// redibujar tooltips de line chart al redimensionar
+window.addEventListener("resize",()=>{if(state.view==="general")renderTrafficChart();});
+
+/* INIT */
+(async function init(){
+  await loadOverview();
+  render();
+})();
+</script>
+</body>
 </html>
