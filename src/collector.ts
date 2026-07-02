@@ -295,7 +295,7 @@ function buildAlerts(snapshot: Omit<MetricsSnapshot, "alerts">): AlertItem[] {
     else if (disk.usedPercent >= 75) alerts.push({ severity: "warn", title: `Disco ${disk.mount} alto`, message: `${disk.usedPercent}% usado.` });
   }
   for (const service of snapshot.services) {
-    if (!/online|running/i.test(service.status)) {
+    if (!/online|running|active/i.test(service.status)) {
       alerts.push({ severity: "critical", title: `${service.name} no esta activo`, message: `Estado actual: ${service.status}.` });
     }
   }
