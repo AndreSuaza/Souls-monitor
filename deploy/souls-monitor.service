@@ -1,0 +1,18 @@
+[Unit]
+Description=Souls Monitor dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+WorkingDirectory=/opt/apps/souls-monitor
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3101
+Environment=METRICS_PATH=/opt/souls-monitor/runtime/metrics.json
+ExecStart=/usr/bin/node /opt/apps/souls-monitor/dist/server.js
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Souls Monitor</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Souls In Xtinction</p>
+          <h1>Monitor VPS</h1>
+        </div>
+        <div class="status-pill" id="freshness">Cargando</div>
+      </header>
+
+      <section class="alert-strip" id="alerts"></section>
+
+      <section class="kpi-grid">
+        <article class="metric">
+          <span>RAM usada</span>
+          <strong id="ram">-</strong>
+          <div class="bar"><i id="ramBar"></i></div>
+        </article>
+        <article class="metric">
+          <span>Disco principal</span>
+          <strong id="disk">-</strong>
+          <div class="bar"><i id="diskBar"></i></div>
+        </article>
+        <article class="metric">
+          <span>Requests analizados</span>
+          <strong id="requests">-</strong>
+          <small id="bytes">-</small>
+        </article>
+        <article class="metric">
+          <span>Servicios activos</span>
+          <strong id="servicesCount">-</strong>
+          <small>PM2 + Docker</small>
+        </article>
+      </section>
+
+      <section class="panel-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Servicios</h2>
+            <span>Consumo actual</span>
+          </div>
+          <div class="table" id="services"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Rutas top</h2>
+            <span>Ordenado por transferencia</span>
+          </div>
+          <div class="table" id="routes"></div>
+        </section>
+      </section>
+
+      <section class="panel-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Estado HTTP</h2>
+            <span>Nginx app-souls</span>
+          </div>
+          <div class="chips" id="statuses"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Almacenamiento</h2>
+            <span>Rutas vigiladas</span>
+          </div>
+          <div class="table" id="storage"></div>
+        </section>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>User agents sospechosos</h2>
+          <span>Bots, crawlers y clientes automatizados</span>
+        </div>
+        <div class="table" id="userAgents"></div>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "souls-monitor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "collect": "node dist/collector.js",
+    "dev": "tsx src/server.ts",
+    "dev:collect": "tsx src/collector.ts",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@types/node": "^22.10.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  },
+  "devDependencies": {}
+}
