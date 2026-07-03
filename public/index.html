@@ -400,11 +400,6 @@
         Souls Monitor <span class="dot" style="background:var(--ok)"></span>
       </a>
     </nav>
-    <div class="sidebar-foot">
-      <div class="row"><span class="led" style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span> VPS operativa</div>
-      <div class="row">CPU 16.4% · RAM 15%</div>
-      <div class="row">Disco 34.2 GB / 80 GB</div>
-    </div>
   </aside>
   <div class="scrim" id="scrim"></div>
 
@@ -764,15 +759,15 @@ const COST_SHARES={
 };
 
 let HOST={
-  cpu:16.4,
-  ramPercent:15,
-  ramUsedMb:1194,
-  ramTotalGb:16,
-  diskUsedGb:34.2,
-  diskPercent:43,
-  diskTotalGb:80,
-  activeServices:3,
-  totalServices:3,
+  cpu:null,
+  ramPercent:null,
+  ramUsedMb:null,
+  ramTotalGb:null,
+  diskUsedGb:null,
+  diskPercent:null,
+  diskTotalGb:null,
+  activeServices:null,
+  totalServices:null,
   generatedAt:null
 };
 let liveSnapshot=null;
@@ -805,6 +800,7 @@ const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const fmt=n=>{n=Math.round(n);return n.toLocaleString("es-ES");};
 const fmt1=n=>n.toLocaleString("es-ES",{minimumFractionDigits:1,maximumFractionDigits:1});
+const fmtMaybe=(value,formatter)=>value==null||Number.isNaN(value)?"-":formatter(value);
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 function fmtBytes(bytes){
   if(bytes==null||Number.isNaN(bytes))return "-";
@@ -1186,7 +1182,7 @@ function renderResourceCards(){
   const cards=[
     {
       label:"Uso de CPU:",
-      value:fmt1(Math.max(0,HOST.cpu))+"%",
+      value:fmtMaybe(HOST.cpu,value=>fmt1(Math.max(0,value))+"%"),
       total:"100%",
       accent:C.purple,
       soft:C.purpleLite,
@@ -1195,8 +1191,8 @@ function renderResourceCards(){
     },
     {
       label:"Uso de memoria:",
-      value:(HOST.ramUsedMb/1024).toFixed(2)+" GiB",
-      total:fmt1(HOST.ramTotalGb)+" GiB",
+      value:fmtMaybe(HOST.ramUsedMb,value=>(value/1024).toFixed(2)+" GiB"),
+      total:fmtMaybe(HOST.ramTotalGb,value=>fmt1(value)+" GiB"),
       accent:C.gold,
       soft:"#FFF7DB",
       bg:"#FFF7DB",
@@ -1204,8 +1200,8 @@ function renderResourceCards(){
     },
     {
       label:"Uso de disco:",
-      value:fmt1(HOST.diskUsedGb)+" GiB",
-      total:fmt1(HOST.diskTotalGb)+" GiB",
+      value:fmtMaybe(HOST.diskUsedGb,value=>fmt1(value)+" GiB"),
+      total:fmtMaybe(HOST.diskTotalGb,value=>fmt1(value)+" GiB"),
       accent:C.purpleDeep,
       soft:C.purpleSoft,
       bg:C.purpleLite,
@@ -1224,7 +1220,8 @@ function renderKpis(){
   const f=activeFactor(), j=state.jitter, prev=state.comparePrev;
   const req=SVC_ORDER.filter(s=>state.service==="all"||s===state.service).reduce((a,s)=>a+SERVICES[s].requests,0);
   const tr=SVC_ORDER.filter(s=>state.service==="all"||s===state.service).reduce((a,s)=>a+SERVICES[s].transfer,0);
-  const cpu=(state.service==="all"?HOST.cpu:SERVICES[state.service].cpu)+seeded(1,j)*0.6-0.3;
+  const cpuBase=state.service==="all"?HOST.cpu:SERVICES[state.service].cpu;
+  const cpu=cpuBase==null?null:cpuBase+seeded(1,j)*0.6-0.3;
   const ramMB=state.service==="all"?HOST.ramUsedMb:SERVICES[state.service].mem;
   const err=(state.service==="all"?0.7:SERVICES[state.service].errorRate)+seeded(2,j)*0.15;
   const five=Math.max(0,Math.round((state.service==="app-souls"||state.service==="all"?23:1)*Math.min(1,RANGE_FACTOR[state.timeRange]/RANGE_FACTOR["1h"])+seeded(5,j)*3));
@@ -1233,10 +1230,10 @@ function renderKpis(){
     {lbl:"Requests 24h",val:fmt(req*f),unit:"",st:"ok",d:"+3.1%",dir:"up",ic:'<path d="M3 12h4l3 8 4-16 3 8h4"/>'},
     {lbl:"Error rate",val:fmt1(err)+"%",unit:"",st:err>0.6?"warn":"ok",d:"+0.2pp",dir:"up",bad:true,ic:'<path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>'},
     {lbl:"5xx últimos 60m",val:fmt(five),unit:"",st:five>10?"crit":five>3?"warn":"ok",d:"+"+Math.round(five*0.8),dir:"up",bad:true,ic:'<path d="M18 6 6 18M6 6l12 12"/>'},
-    {lbl:"CPU VPS",val:fmt1(Math.max(0,cpu))+"%",unit:"",st:cpu>70?"crit":cpu>45?"warn":"ok",d:"-1.2pp",dir:"down",ic:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>'},
-    {lbl:"RAM VPS",val:(ramMB/1024).toFixed(2)+" ",unit:"GB",st:HOST.ramPercent>85?"crit":HOST.ramPercent>75?"warn":"ok",d:fmt1(HOST.ramPercent)+"%",dir:"up",ic:'<rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 7V5M12 7V5M17 7V5M7 21v-2M17 21v-2"/>'},
-    {lbl:"Disco usado",val:fmt1(HOST.diskUsedGb)+" ",unit:"GB",st:HOST.diskPercent>90?"crit":HOST.diskPercent>75?"warn":"ok",d:fmt1(HOST.diskPercent)+"%",dir:"up",ic:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/>'},
-    {lbl:"Servicios activos",val:(state.service==="all"?HOST.activeServices+"/"+HOST.totalServices:"1/1"),unit:"",st:HOST.activeServices>=HOST.totalServices?"ok":"crit",d:"estable",dir:"flat",ic:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'}
+    {lbl:"CPU VPS",val:fmtMaybe(cpu,value=>fmt1(Math.max(0,value))+"%"),unit:"",st:cpu>70?"crit":cpu>45?"warn":"ok",d:"-1.2pp",dir:"down",ic:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>'},
+    {lbl:"RAM VPS",val:fmtMaybe(ramMB,value=>(value/1024).toFixed(2)+" "),unit:ramMB==null?"":"GB",st:HOST.ramPercent>85?"crit":HOST.ramPercent>75?"warn":"ok",d:fmtMaybe(HOST.ramPercent,value=>fmt1(value)+"%"),dir:"up",ic:'<rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 7V5M12 7V5M17 7V5M7 21v-2M17 21v-2"/>'},
+    {lbl:"Disco usado",val:fmtMaybe(HOST.diskUsedGb,value=>fmt1(value)+" "),unit:HOST.diskUsedGb==null?"":"GB",st:HOST.diskPercent>90?"crit":HOST.diskPercent>75?"warn":"ok",d:fmtMaybe(HOST.diskPercent,value=>fmt1(value)+"%"),dir:"up",ic:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/>'},
+    {lbl:"Servicios activos",val:(state.service==="all"?(HOST.activeServices==null||HOST.totalServices==null?"-":HOST.activeServices+"/"+HOST.totalServices):"1/1"),unit:"",st:HOST.activeServices>=HOST.totalServices?"ok":"crit",d:"estable",dir:"flat",ic:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'}
   ];
   $("#g-kpis").innerHTML=kpis.map(k=>{
     const dcls=k.dir==="up"?(k.bad?"up bad":"up"):k.dir==="down"?"down":"flat";
