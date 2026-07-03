@@ -11,6 +11,7 @@ export interface HostSnapshot {
   generatedAt: string;
   uptimeSeconds: number;
   loadAverage: number[];
+  cpuPercent?: number | null;
   memory: {
     totalBytes: number;
     freeBytes: number;

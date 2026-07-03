@@ -50,7 +50,30 @@ function parseDockerNet(value: string): { rx: number | null; tx: number | null }
   return { rx: parseBytes(rxRaw), tx: parseBytes(txRaw) };
 }
 
+async function readCpuSample(): Promise<{ idle: number; total: number } | null> {
+  const stat = await fs.readFile("/proc/stat", "utf8").catch(() => "");
+  const firstLine = stat.split("\n")[0] || "";
+  const parts = firstLine.trim().split(/\s+/).slice(1).map(Number);
+  if (parts.length < 4 || parts.some((value) => !Number.isFinite(value))) return null;
+  const idle = (parts[3] || 0) + (parts[4] || 0);
+  const total = parts.reduce((sum, value) => sum + value, 0);
+  return { idle, total };
+}
+
+async function collectCpuPercent(): Promise<number | null> {
+  const before = await readCpuSample();
+  if (!before) return null;
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  const after = await readCpuSample();
+  if (!after) return null;
+  const idleDelta = after.idle - before.idle;
+  const totalDelta = after.total - before.total;
+  if (totalDelta <= 0) return null;
+  return Math.round((1 - idleDelta / totalDelta) * 1000) / 10;
+}
+
 async function collectHost(): Promise<HostSnapshot> {
+  const cpuPercent = await collectCpuPercent();
   const meminfo = await fs.readFile("/proc/meminfo", "utf8").catch(() => "");
   const values = new Map<string, number>();
   for (const line of meminfo.split("\n")) {
@@ -80,6 +103,7 @@ async function collectHost(): Promise<HostSnapshot> {
     generatedAt: new Date().toISOString(),
     uptimeSeconds: Math.round(os.uptime()),
     loadAverage: os.loadavg(),
+    cpuPercent,
     memory: {
       totalBytes,
       freeBytes,
