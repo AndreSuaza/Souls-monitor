@@ -63,7 +63,7 @@ async function readCpuSample(): Promise<{ idle: number; total: number } | null> 
 async function collectCpuPercent(): Promise<number | null> {
   const before = await readCpuSample();
   if (!before) return null;
-  await new Promise((resolve) => setTimeout(resolve, 250));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   const after = await readCpuSample();
   if (!after) return null;
   const idleDelta = after.idle - before.idle;
@@ -341,8 +341,8 @@ function buildAlerts(snapshot: Omit<MetricsSnapshot, "alerts">): AlertItem[] {
 }
 
 async function main() {
-  const [host, pm2, docker, systemd, nginx, storage] = await Promise.all([
-    collectHost(),
+  const host = await collectHost();
+  const [pm2, docker, systemd, nginx, storage] = await Promise.all([
     collectPm2(),
     collectDocker(),
     collectSystemd(),
