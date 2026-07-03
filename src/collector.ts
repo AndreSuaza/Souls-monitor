@@ -177,7 +177,7 @@ function parseSystemctlShow(output: string) {
 }
 
 async function collectSystemd(): Promise<ServiceSnapshot[]> {
-  const units = ["souls-monitor.service"];
+  const units = ["souls-monitor.service", "souls-simulador.service"];
   const snapshots: Array<ServiceSnapshot | null> = await Promise.all(
     units.map(async (unit) => {
       const stdout = await run("systemctl", [
@@ -297,7 +297,7 @@ async function collectNginx(): Promise<NginxSnapshot> {
 
 async function collectStorage(): Promise<StorageSnapshot> {
   const paths = await Promise.all(
-    ["/opt/apps/app-souls", "/opt/openclaw-hgga/data", "/opt/apps/souls-monitor", "/var/log/nginx"].map(async (target) => {
+    ["/opt/apps/app-souls", "/opt/openclaw-hgga/data", "/opt/apps/souls-monitor", "/opt/apps/souls-simulador", "/var/log/nginx"].map(async (target) => {
       const stdout = await run("du", ["-sb", target]);
       const bytes = Number(stdout.split(/\s+/)[0]);
       return { path: target, bytes: Number.isFinite(bytes) ? bytes : null };

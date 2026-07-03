@@ -399,6 +399,10 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
         Souls Monitor <span class="dot" style="background:var(--ok)"></span>
       </a>
+      <a class="nav-item" data-svc="souls-simulador">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3M8 9h.01M12 9h.01M16 9h.01M9 13h6"/></svg>
+        Souls Simulador <span class="dot" style="background:var(--ok)"></span>
+      </a>
     </nav>
   </aside>
   <div class="scrim" id="scrim"></div>
@@ -442,6 +446,7 @@
           <option value="app-souls">app-souls</option>
           <option value="openclaw">OpenClaw</option>
           <option value="souls-monitor">Souls Monitor</option>
+          <option value="souls-simulador">Souls Simulador</option>
         </select>
       </div>
       <div class="fgroup">
@@ -645,6 +650,7 @@
                   <option value="app-souls">app-souls</option>
                   <option value="openclaw">OpenClaw</option>
                   <option value="souls-monitor">Souls Monitor</option>
+                  <option value="souls-simulador">Souls Simulador</option>
                 </select>
                 <button class="btn" id="backBtn">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -685,7 +691,7 @@ const C={purple:"#7C3AED",purpleDeep:"#4D3267",purpleSoft:"#D0BCFF",purpleLite:"
 let SERVICES={
   "app-souls":{id:"app-souls",name:"app-souls",status:"Online",level:"ok",runtime:"PM2",
     port:"127.0.0.1:3000",mem:650,cpu:8.4,uptime:"3d 12h",requests:18420,transfer:482,errorRate:0.7,
-    icon:"p",exposure:"Público · Nginx + Cloudflare + HTTPS",alertsW:1,alertsC:1,costShare:72},
+    icon:"p",exposure:"Público · Nginx + Cloudflare + HTTPS",alertsW:1,alertsC:1,costShare:60},
   "openclaw":{id:"openclaw",name:"OpenClaw",status:"Running",level:"ok",runtime:"Docker",
     port:"127.0.0.1:46858",mem:530,cpu:4.2,uptime:"1d 8h",requests:640,transfer:22,errorRate:0.2,
     icon:"g",exposure:"Privado · 127.0.0.1 (sin exposición pública)",alertsW:0,alertsC:0,costShare:24,
@@ -693,9 +699,13 @@ let SERVICES={
   "souls-monitor":{id:"souls-monitor",name:"Souls Monitor",status:"Online",level:"ok",runtime:"systemd + Node.js",
     port:"127.0.0.1:3101",mem:14,cpu:1.1,uptime:"18h",requests:210,transfer:8,errorRate:0.0,
     icon:"i",exposure:"Público · HTTPS + Basic Auth",alertsW:1,alertsC:0,costShare:4,
-    domain:"monitor.soulsinxtinction.com"}
+    domain:"monitor.soulsinxtinction.com"},
+  "souls-simulador":{id:"souls-simulador",name:"Souls Simulador",status:"Online",level:"ok",runtime:"systemd + Node.js",
+    port:"127.0.0.1:2567",mem:80,cpu:1.5,uptime:"1h",requests:0,transfer:0,errorRate:0.0,
+    icon:"p",exposure:"Público pendiente · Nginx listo, falta DNS + HTTPS",alertsW:0,alertsC:0,costShare:12,
+    domain:"simulador.soulsinxtinction.com"}
 };
-const SVC_ORDER=["app-souls","openclaw","souls-monitor"];
+const SVC_ORDER=["app-souls","openclaw","souls-monitor","souls-simulador"];
 
 let TOP_ROUTES=[
   {route:"/_next/image",transfer:168,requests:3240,risk:"warn",riskLabel:"Medio",highlight:true,type:"images"},
@@ -748,6 +758,7 @@ let STORAGE=[
   {path:"/opt/apps/app-souls",svc:"app-souls",size:"3.8 GB",pct:62,growth:"+180 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acción"},
   {path:"/opt/openclaw-hgga/data",svc:"openclaw",size:"1.4 GB",pct:34,growth:"+64 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acción"},
   {path:"/opt/apps/souls-monitor",svc:"souls-monitor",size:"210 MB",pct:12,growth:"+9 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acción"},
+  {path:"/opt/apps/souls-simulador",svc:"souls-simulador",size:"240 MB",pct:14,growth:"+0 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acción"},
   {path:"/var/log/nginx",svc:"app-souls",size:"2.1 GB",pct:78,growth:"+420 MB",risk:"warn",riskLabel:"Medio",rec:"Configurar logrotate"}
 ];
 
@@ -755,7 +766,8 @@ let STORAGE=[
 const COST_SHARES={
   "app-souls":[{k:"CPU share",v:40,c:C.purple},{k:"RAM share",v:30,c:C.gold},{k:"Storage share",v:12,c:C.purpleDeep},{k:"Transfer share",v:18,c:C.info}],
   "openclaw":[{k:"CPU share",v:34,c:C.purple},{k:"RAM share",v:40,c:C.gold},{k:"Storage share",v:18,c:C.purpleDeep},{k:"Transfer share",v:8,c:C.info}],
-  "souls-monitor":[{k:"CPU share",v:20,c:C.purple},{k:"RAM share",v:26,c:C.gold},{k:"Storage share",v:14,c:C.purpleDeep},{k:"Transfer share",v:40,c:C.info}]
+  "souls-monitor":[{k:"CPU share",v:20,c:C.purple},{k:"RAM share",v:26,c:C.gold},{k:"Storage share",v:14,c:C.purpleDeep},{k:"Transfer share",v:40,c:C.info}],
+  "souls-simulador":[{k:"CPU share",v:35,c:C.purple},{k:"RAM share",v:30,c:C.gold},{k:"Storage share",v:25,c:C.purpleDeep},{k:"Transfer share",v:10,c:C.info}]
 };
 
 let HOST={
@@ -830,6 +842,7 @@ function serviceIdFromName(name){
   if(value==="app-souls"||value.includes("app-souls"))return "app-souls";
   if(value.includes("openclaw"))return "openclaw";
   if(value.includes("souls-monitor"))return "souls-monitor";
+  if(value.includes("simulador")||value.includes("simulator")||value.includes("colyseus"))return "souls-simulador";
   return null;
 }
 function serviceLevel(status){
@@ -918,7 +931,7 @@ function applyOverview(data){
   for(const id of SVC_ORDER)alertCounts[id]={warn:0,crit:0};
   for(const alert of data.alerts||[]){
     const text=((alert.title||"")+" "+(alert.message||"")).toLowerCase();
-    const id=text.includes("openclaw")?"openclaw":text.includes("monitor")||text.includes("sospechoso")?"souls-monitor":"app-souls";
+    const id=text.includes("simulador")||text.includes("colyseus")?"souls-simulador":text.includes("openclaw")?"openclaw":text.includes("monitor")||text.includes("sospechoso")?"souls-monitor":"app-souls";
     if(alert.severity==="critical")alertCounts[id].crit++;
     else if(alert.severity==="warn")alertCounts[id].warn++;
   }
@@ -959,7 +972,7 @@ function applyOverview(data){
   if(data.storage?.paths?.length){
     const totalStorage=(mainDisk?.sizeBytes||80*1024*1024*1024);
     STORAGE=data.storage.paths.map(item=>{
-      const id=item.path.includes("openclaw")?"openclaw":item.path.includes("souls-monitor")?"souls-monitor":"app-souls";
+      const id=item.path.includes("souls-simulador")?"souls-simulador":item.path.includes("openclaw")?"openclaw":item.path.includes("souls-monitor")?"souls-monitor":"app-souls";
       const pct=item.bytes?clamp(item.bytes/totalStorage*100,1,100):0;
       const warn=item.path.includes("/var/log")&&item.bytes>1024*1024*1024;
       return {
@@ -978,7 +991,7 @@ function applyOverview(data){
   if(data.alerts?.length){
     ALERTS=data.alerts.map((alert,index)=>{
       const text=((alert.title||"")+" "+(alert.message||"")).toLowerCase();
-      const svc=text.includes("openclaw")?"openclaw":text.includes("monitor")||text.includes("sospechoso")?"souls-monitor":"app-souls";
+      const svc=text.includes("simulador")||text.includes("colyseus")?"souls-simulador":text.includes("openclaw")?"openclaw":text.includes("monitor")||text.includes("sospechoso")?"souls-monitor":"app-souls";
       return {
         level:severityLevel(alert.severity),
         time:index===0?"ahora":"-"+(index*4)+"m",
@@ -1271,6 +1284,7 @@ function renderServices(){
 function svcIcon(id){
   if(id==="app-souls")return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>';
   if(id==="openclaw")return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 8-6-16-3 8H2"/></svg>';
+  if(id==="souls-simulador")return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3M8 9h.01M12 9h.01M16 9h.01M9 13h6"/></svg>';
   return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
 }
 
@@ -1377,7 +1391,7 @@ function renderBotsTable(){
 function renderCosts(){
   const cost=state.monthlyCost;
   const meters=SVC_ORDER.map(id=>{const s=SERVICES[id];const c=cost*s.costShare/100;
-    const col=id==="app-souls"?C.purple:id==="openclaw"?C.gold:C.info;
+    const col=id==="app-souls"?C.purple:id==="openclaw"?C.gold:id==="souls-simulador"?C.purpleDeep:C.info;
     return '<div class="meter"><div class="mt-top"><span class="nm">'+s.name+'</span><span class="pc">'+s.costShare+'%</span><span class="cost">€'+c.toFixed(2)+'</span></div>'+
       '<div class="track"><div class="fill" style="width:'+s.costShare+'%;background:'+col+'"></div></div></div>';}).join("");
   $("#cost-meters").innerHTML=meters;
@@ -1445,6 +1459,7 @@ function tabPerformance(id,s){
   let runtimeTable="";
   if(id==="app-souls")runtimeTable=rtTable(["PM2 name","PID","Restarts","Memory","CPU"],["app-souls",s.pid||"n/d",s.restarts??"n/d",s.mem+" MB",s.cpu+"%"]);
   else if(id==="openclaw")runtimeTable=rtTable(["Container","Image","Restarts","Memory","CPU"],[s.container||"openclaw-hgga-openclaw-1",s.image||"openclaw-hgga-patched",s.restarts??"n/d",s.mem+" MB",s.cpu+"%"]);
+  else if(id==="souls-simulador")runtimeTable=rtTable(["systemd service","Puerto","Dominio","Memory","CPU"],["souls-simulador.service",s.port,s.domain||"simulador.soulsinxtinction.com",s.mem+" MB",s.cpu+"%"]);
   else runtimeTable=rtTable(["systemd service","Collector timer","Metrics age","Memory","CPU"],["souls-monitor.service","souls-monitor-collector.timer (60s)",secondsAgo(HOST.generatedAt),s.mem+" MB",s.cpu+"%"]);
   return '<div class="sec-block"><h3>CPU y RAM en el tiempo <span class="muted">· '+state.timeRange+'</span></h3>'+
     '<div class="chartbox chart" id="chart-cpuram"></div>'+
@@ -1488,6 +1503,15 @@ function tabTrafico(id,s){
       '<tr><td>Gemini</td><td class="num">412</td><td class="num">6</td><td><span class="badge warn"><span class="led"></span> 429 rate-limit</span></td></tr>'+
       '<tr><td>OpenAI</td><td class="num">318</td><td class="num">0</td><td><span class="badge ok"><span class="led"></span> OK</span></td></tr>'+
       '<tr><td>API interna</td><td class="num">554</td><td class="num">1</td><td><span class="badge ok"><span class="led"></span> OK</span></td></tr></tbody></table></div></div>';
+  }else if(id==="souls-simulador"){
+    table='<div class="sec-block"><h3>Servidor de juego</h3><div class="kv">'+
+      kvItem("Colyseus",'<span class="badge ok"><span class="led"></span> activo</span>')+
+      kvItem("Puerto local",s.port)+
+      kvItem("Subdominio",s.domain||"simulador.soulsinxtinction.com")+
+      kvItem("WebSocket",'<span class="badge ok"><span class="led"></span> probado por Nginx</span>')+'</div></div>'+
+      '<div class="sec-block"><h3>Rutas backend</h3><div class="tbl-wrap"><table><thead><tr><th>Ruta</th><th>Uso</th><th>Estado</th></tr></thead><tbody>'+
+      '<tr><td class="mono">/matchmake/*</td><td>Crear / unir salas</td><td><span class="badge ok"><span class="led"></span> OK</span></td></tr>'+
+      '<tr><td class="mono">/:process/:room</td><td>WebSocket de sala</td><td><span class="badge ok"><span class="led"></span> OK</span></td></tr></tbody></table></div></div>';
   }else{
     table='<div class="sec-block"><h3>Dashboard y salud</h3><div class="kv">'+
       kvItem("Requests dashboard","210")+kvItem("401 Basic Auth","37")+kvItem("Health checks","OK · cada 60s")+kvItem("metrics.json","actualizado hace 42s")+'</div></div>'+
@@ -1500,7 +1524,7 @@ function tabTrafico(id,s){
     '<div class="legend"><span class="li"><span class="sw" style="background:'+C.ok+'"></span> 2xx</span><span class="li"><span class="sw" style="background:'+C.info+'"></span> 3xx</span><span class="li"><span class="sw" style="background:'+C.warn+'"></span> 4xx</span><span class="li"><span class="sw" style="background:'+C.crit+'"></span> 5xx</span></div></div>'+table;
 }
 function afterTrafico(id,s){
-  const n=8;const cats=[];const base=id==="app-souls"?1:id==="openclaw"?0.5:0.25;
+  const n=8;const cats=[];const base=id==="app-souls"?1:id==="openclaw"?0.5:id==="souls-simulador"?0.35:0.25;
   for(let i=0;i<n;i++){const scale=base*(60+seeded(i,17)*80);
     cats.push({label:"h-"+(n-i),values:[
       Math.round(scale*(0.9+0.1*seeded(i,1))),
@@ -1590,9 +1614,11 @@ function afterCostos(id,s){
 function tabSeguridad(id,s){
   const exposure=id==="app-souls"?{t:"Público",c:"warn",d:"Expuesto por Nginx + Cloudflare + HTTPS"}:
     id==="openclaw"?{t:"Privado",c:"ok",d:"Solo accesible en 127.0.0.1 (sin exposición pública)"}:
+    id==="souls-simulador"?{t:"Público pendiente",c:"warn",d:"Nginx configurado para simulador.soulsinxtinction.com; falta DNS y certificado HTTPS."}:
     {t:"Público protegido",c:"info",d:"HTTPS + Basic Auth en monitor.soulsinxtinction.com"};
   const cert=id==="souls-monitor"?{dom:"monitor.soulsinxtinction.com",exp:"2026-09-14",days:74}:
-    id==="app-souls"?{dom:"soulsinxtinction.com",exp:"2026-09-14",days:74}:{dom:"— (sin dominio público)",exp:"n/a",days:null};
+    id==="app-souls"?{dom:"soulsinxtinction.com",exp:"2026-09-14",days:74}:
+    id==="souls-simulador"?{dom:"simulador.soulsinxtinction.com",exp:"pendiente DNS",days:null}:{dom:"— (sin dominio público)",exp:"n/a",days:null};
   const events=[
     {t:"Intentos a /.env",c:"crit",n:14,d:"Bloqueados por Basic Auth / 404"},
     {t:"Intentos a /docker-compose.yml",c:"crit",n:8,d:"Bloqueados"},
@@ -1605,6 +1631,10 @@ function tabSeguridad(id,s){
   ]:id==="openclaw"?[
     {t:"Servicio no expuesto",c:"ok",d:"Correcto: solo binding local 127.0.0.1."},
     {t:"Tokens Telegram/API",c:"warn",d:"Verificar rotación periódica de credenciales."}
+  ]:id==="souls-simulador"?[
+    {t:"DNS pendiente",c:"warn",d:"Crear A record simulador -> 209.145.63.84."},
+    {t:"WebSocket probado",c:"ok",d:"Nginx enruta /matchmake y WebSocket al puerto 2567."},
+    {t:"Emitir TLS",c:"warn",d:"Ejecutar certbot cuando el DNS resuelva."}
   ]:[
     {t:"Basic Auth funcionando",c:"ok",d:"401 correctos ante escaneos automatizados."},
     {t:"Bloquear IPs reincidentes",c:"warn",d:"Añadir fail2ban para /.env y /admin."}
