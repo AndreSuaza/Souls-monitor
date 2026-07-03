@@ -702,7 +702,7 @@ let SERVICES={
     domain:"monitor.soulsinxtinction.com"},
   "souls-simulador":{id:"souls-simulador",name:"Souls Simulador",status:"Online",level:"ok",runtime:"systemd + Node.js",
     port:"127.0.0.1:2567",mem:80,cpu:1.5,uptime:"1h",requests:0,transfer:0,errorRate:0.0,
-    icon:"p",exposure:"Público pendiente · Nginx listo, falta DNS + HTTPS",alertsW:0,alertsC:0,costShare:12,
+    icon:"p",exposure:"Público · Nginx + Cloudflare + HTTPS",alertsW:0,alertsC:0,costShare:12,
     domain:"simulador.soulsinxtinction.com"}
 };
 const SVC_ORDER=["app-souls","openclaw","souls-monitor","souls-simulador"];
@@ -1614,11 +1614,11 @@ function afterCostos(id,s){
 function tabSeguridad(id,s){
   const exposure=id==="app-souls"?{t:"Público",c:"warn",d:"Expuesto por Nginx + Cloudflare + HTTPS"}:
     id==="openclaw"?{t:"Privado",c:"ok",d:"Solo accesible en 127.0.0.1 (sin exposición pública)"}:
-    id==="souls-simulador"?{t:"Público pendiente",c:"warn",d:"Nginx configurado para simulador.soulsinxtinction.com; falta DNS y certificado HTTPS."}:
+    id==="souls-simulador"?{t:"Público",c:"ok",d:"Expuesto por Nginx + Cloudflare + HTTPS en simulador.soulsinxtinction.com."}:
     {t:"Público protegido",c:"info",d:"HTTPS + Basic Auth en monitor.soulsinxtinction.com"};
   const cert=id==="souls-monitor"?{dom:"monitor.soulsinxtinction.com",exp:"2026-09-14",days:74}:
     id==="app-souls"?{dom:"soulsinxtinction.com",exp:"2026-09-14",days:74}:
-    id==="souls-simulador"?{dom:"simulador.soulsinxtinction.com",exp:"pendiente DNS",days:null}:{dom:"— (sin dominio público)",exp:"n/a",days:null};
+    id==="souls-simulador"?{dom:"simulador.soulsinxtinction.com",exp:"2026-10-01",days:90}:{dom:"— (sin dominio público)",exp:"n/a",days:null};
   const events=[
     {t:"Intentos a /.env",c:"crit",n:14,d:"Bloqueados por Basic Auth / 404"},
     {t:"Intentos a /docker-compose.yml",c:"crit",n:8,d:"Bloqueados"},
@@ -1632,9 +1632,9 @@ function tabSeguridad(id,s){
     {t:"Servicio no expuesto",c:"ok",d:"Correcto: solo binding local 127.0.0.1."},
     {t:"Tokens Telegram/API",c:"warn",d:"Verificar rotación periódica de credenciales."}
   ]:id==="souls-simulador"?[
-    {t:"DNS pendiente",c:"warn",d:"Crear A record simulador -> 209.145.63.84."},
+    {t:"DNS activo",c:"ok",d:"Cloudflare resuelve simulador.soulsinxtinction.com."},
     {t:"WebSocket probado",c:"ok",d:"Nginx enruta /matchmake y WebSocket al puerto 2567."},
-    {t:"Emitir TLS",c:"warn",d:"Ejecutar certbot cuando el DNS resuelva."}
+    {t:"TLS activo",c:"ok",d:"Certificado Let's Encrypt emitido hasta 2026-10-01."}
   ]:[
     {t:"Basic Auth funcionando",c:"ok",d:"401 correctos ante escaneos automatizados."},
     {t:"Bloquear IPs reincidentes",c:"warn",d:"Añadir fail2ban para /.env y /admin."}
