@@ -1,0 +1,70 @@
+name: Deploy Souls Monitor to Contabo VPS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: souls-monitor-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/souls_monitor_vps
+          chmod 600 ~/.ssh/souls_monitor_vps
+          printf '%s\n' "${{ secrets.VPS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Deploy on VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          ssh -i ~/.ssh/souls_monitor_vps -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" 'bash -s' <<'REMOTE'
+          set -euo pipefail
+
+          cd /opt/apps/souls-monitor
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+
+          npm ci
+          npm run check
+          npm run build
+
+          sudo mkdir -p /opt/souls-monitor/runtime
+          sudo chown -R deploy:deploy /opt/souls-monitor
+
+          sudo cp deploy/souls-monitor.service /etc/systemd/system/souls-monitor.service
+          sudo cp deploy/souls-monitor-collector.service /etc/systemd/system/souls-monitor-collector.service
+          sudo cp deploy/souls-monitor-collector.timer /etc/systemd/system/souls-monitor-collector.timer
+          sudo systemctl daemon-reload
+          sudo systemctl enable souls-monitor.service souls-monitor-collector.timer
+          sudo systemctl restart souls-monitor.service
+          sudo systemctl restart souls-monitor-collector.timer
+          sudo systemctl start souls-monitor-collector.service || true
+
+          sudo nginx -t
+
+          for attempt in $(seq 1 30); do
+            if curl -fsS -A "GitHubActionsDeployCheck" http://127.0.0.1:3101/ >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+
+          sudo journalctl -u souls-monitor.service -n 80 --no-pager
+          exit 1
+          REMOTE
