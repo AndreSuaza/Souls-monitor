@@ -723,6 +723,7 @@ SERVICES["app-souls"].domain="soulsinxtinction.com";
 SERVICES["app-souls"].url="https://soulsinxtinction.com";
 SERVICES["openclaw"].domain="openclaw.soulsinxtinction.com";
 SERVICES["openclaw"].url="https://openclaw.soulsinxtinction.com";
+SERVICES["openclaw"].exposure="Publico protegido - Nginx + Cloudflare + HTTPS + Basic Auth";
 SERVICES["souls-monitor"].url="https://monitor.soulsinxtinction.com";
 SERVICES["souls-simulador"].url="https://simulador.soulsinxtinction.com";
 const SVC_ORDER=["app-souls","openclaw","souls-monitor","souls-simulador"];
@@ -1651,12 +1652,13 @@ function afterCostos(id,s){
 /* ---- Tab Seguridad ---- */
 function tabSeguridad(id,s){
   const exposure=id==="app-souls"?{t:"Público",c:"warn",d:"Expuesto por Nginx + Cloudflare + HTTPS"}:
-    id==="openclaw"?{t:"Privado",c:"ok",d:"Solo accesible en 127.0.0.1 (sin exposición pública)"}:
+    id==="openclaw"?{t:"Público protegido",c:"info",d:"Expuesto por Nginx + Cloudflare + HTTPS con Basic Auth en openclaw.soulsinxtinction.com."}:
     id==="souls-simulador"?{t:"Público",c:"ok",d:"Expuesto por Nginx + Cloudflare + HTTPS en simulador.soulsinxtinction.com."}:
     {t:"Público protegido",c:"info",d:"HTTPS + Basic Auth en monitor.soulsinxtinction.com"};
   const cert=id==="souls-monitor"?{dom:"monitor.soulsinxtinction.com",exp:"2026-09-14",days:74}:
     id==="app-souls"?{dom:"soulsinxtinction.com",exp:"2026-09-14",days:74}:
-    id==="souls-simulador"?{dom:"simulador.soulsinxtinction.com",exp:"2026-10-01",days:90}:{dom:"— (sin dominio público)",exp:"n/a",days:null};
+    id==="souls-simulador"?{dom:"simulador.soulsinxtinction.com",exp:"2026-10-01",days:90}:
+    id==="openclaw"?{dom:"openclaw.soulsinxtinction.com",exp:"2026-10-08",days:89}:{dom:"— (sin dominio público)",exp:"n/a",days:null};
   const events=[
     {t:"Intentos a /.env",c:"crit",n:14,d:"Bloqueados por Basic Auth / 404"},
     {t:"Intentos a /docker-compose.yml",c:"crit",n:8,d:"Bloqueados"},
@@ -1667,7 +1669,8 @@ function tabSeguridad(id,s){
     {t:"Revisar picos 5xx",c:"warn",d:"Correlacionar con transferencia de /_next/image."},
     {t:"Rotación de logs",c:"warn",d:"Configurar logrotate en /var/log/nginx."}
   ]:id==="openclaw"?[
-    {t:"Servicio no expuesto",c:"ok",d:"Correcto: solo binding local 127.0.0.1."},
+    {t:"Basic Auth activo",c:"ok",d:"La interfaz pública exige credenciales antes del proxy a OpenClaw."},
+    {t:"Proxy local",c:"ok",d:"Nginx enruta HTTPS hacia 127.0.0.1:46858."},
     {t:"Tokens Telegram/API",c:"warn",d:"Verificar rotación periódica de credenciales."}
   ]:id==="souls-simulador"?[
     {t:"DNS activo",c:"ok",d:"Cloudflare resuelve simulador.soulsinxtinction.com."},
