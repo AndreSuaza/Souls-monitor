@@ -180,6 +180,9 @@
   .badge.info{background:#F0F9FF;color:#0369A1;border-color:#BAE6FD}.badge.info .led{background:var(--info)}
   .badge.neutral{background:var(--table-head);color:var(--tx-2);border-color:var(--bd)}.badge.neutral .led{background:var(--faint)}
   .badge.purple{background:var(--purple-lite);color:var(--purple);border-color:var(--bd-souls)}.badge.purple .led{background:var(--purple)}
+  .badge.domain-link{color:#0369A1;text-decoration:none;transition:border-color .15s,box-shadow .15s,transform .15s}
+  .badge.domain-link:hover{border-color:var(--info);box-shadow:0 2px 8px rgba(56,189,248,.18);transform:translateY(-1px)}
+  .badge.domain-link:focus-visible{outline:2px solid var(--info);outline-offset:2px}
   .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;font-size:12.5px;font-weight:700;border:1px solid var(--bd);background:var(--card-elev)}
   .chip b{font-weight:800}
   .chips{display:flex;gap:8px;flex-wrap:wrap}
@@ -716,6 +719,12 @@ let SERVICES={
     icon:"p",exposure:"Público · Nginx + Cloudflare + HTTPS",alertsW:0,alertsC:0,costShare:12,
     domain:"simulador.soulsinxtinction.com"}
 };
+SERVICES["app-souls"].domain="soulsinxtinction.com";
+SERVICES["app-souls"].url="https://soulsinxtinction.com";
+SERVICES["openclaw"].domain="openclaw.soulsinxtinction.com";
+SERVICES["openclaw"].url="https://openclaw.soulsinxtinction.com";
+SERVICES["souls-monitor"].url="https://monitor.soulsinxtinction.com";
+SERVICES["souls-simulador"].url="https://simulador.soulsinxtinction.com";
 const SVC_ORDER=["app-souls","openclaw","souls-monitor","souls-simulador"];
 
 let TOP_ROUTES=[
@@ -1448,6 +1457,12 @@ function serviceLogoMark(id){
   return '<svg role="img" aria-label="Logo de Souls Monitor" title="Souls Monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2s7 3 7 9c0 4-3 7-7 11-4-4-7-7-7-11 0-6 7-9 7-9Z"/><circle cx="12" cy="10" r="2.4"/></svg>';
 }
 
+function domainBadge(s){
+  if(!s.domain)return "";
+  const href=s.url||("https://"+s.domain);
+  return '<a class="badge info domain-link" href="'+href+'" target="_blank" rel="noopener noreferrer" title="Abrir '+s.name+'"><span class="led"></span> '+s.domain+'</a>';
+}
+
 function renderDetailHeader(){
   const s=SERVICES[state.detailService];
   $("#d-ic").className="d-ic "+s.icon;
@@ -1456,7 +1471,7 @@ function renderDetailHeader(){
   $("#d-meta").innerHTML='<span class="badge '+levelClass(s.level)+'"><span class="led"></span> '+s.status+'</span>'+
     '<span class="badge purple"><span class="led"></span> '+s.runtime+'</span>'+
     '<span class="badge neutral"><span class="led"></span> '+s.port+'</span>'+
-    (s.domain?'<span class="badge info"><span class="led"></span> '+s.domain+'</span>':'')+
+    domainBadge(s)+
     (s.container?'<span class="badge neutral mono" style="font-size:11px"><span class="led"></span> '+s.container+'</span>':'');
   $("#d-stats").innerHTML=[
     {k:"Estado",v:s.status},{k:"Runtime",v:s.runtime},{k:"CPU",v:s.cpu+"%"},{k:"RAM",v:s.mem+" MB"},
