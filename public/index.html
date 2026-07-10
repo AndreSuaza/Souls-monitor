@@ -282,11 +282,17 @@
   i.led-ok{background:var(--ok)}i.led-warn{background:var(--warn)}i.led-crit{background:var(--crit)}i.led-info{background:var(--info)}
 
   /* ---------- Detail ---------- */
-  .detail-head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
-  .detail-head .d-ic{width:52px;height:52px;border-radius:11px;display:grid;place-items:center;color:#fff;flex:0 0 52px}
+  .detail-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:start;gap:12px 16px}
+  .detail-head .d-ic{width:68px;height:68px;border-radius:12px;display:grid;place-items:center;color:#fff;overflow:hidden;border:1px solid var(--bd);box-shadow:var(--shadow-sm);background:var(--card-elev)}
+  .detail-head .d-ic img{display:block;width:100%;height:100%;object-fit:contain;padding:8px}
+  .detail-head .d-ic svg{width:34px;height:34px}
+  .detail-head .d-ic.p{background:linear-gradient(135deg,#161120,#2b1743);border-color:var(--bd-souls)}
+  .detail-head .d-ic.g{background:linear-gradient(135deg,#FEF3C7,#F59E0B);color:#4B2E05;border-color:#FDE68A}
+  .detail-head .d-ic.i{background:linear-gradient(135deg,#EFF6FF,#38BDF8);color:#075985;border-color:#BAE6FD}
+  .detail-title{min-width:0;padding-top:2px}
   .detail-head h2{margin:0;font-size:19px;font-weight:800}
   .detail-head .dh-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
-  .detail-head .dh-right{margin-left:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .detail-head .dh-right{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
   .stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-top:16px}
   .stat{background:var(--bg-2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px}
   .stat .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--faint);font-weight:600}
@@ -359,6 +365,11 @@
     .resource-card .r-icon{width:58px;height:58px;flex-basis:58px}
     .resource-card svg{width:32px;height:32px}
     .tbl-wrap{max-width:calc(100vw - 48px)}
+    .detail-head{grid-template-columns:auto minmax(0,1fr);gap:10px 12px}
+    .detail-head .d-ic{width:54px;height:54px;border-radius:10px}
+    .detail-head .d-ic img{padding:7px}
+    .detail-head .d-ic svg{width:27px;height:27px}
+    .detail-head .dh-right{grid-column:1/-1;justify-content:flex-start;width:100%;margin-left:0}
   }
 </style>
 </head>
@@ -641,7 +652,7 @@
           <div class="body">
             <div class="detail-head">
               <div class="d-ic" id="d-ic"></div>
-              <div>
+              <div class="detail-title">
                 <h2 id="d-name">app-souls</h2>
                 <div class="dh-meta" id="d-meta"></div>
               </div>
@@ -1426,9 +1437,21 @@ function renderGeneral(){
 function openDetail(id){state.detailService=id;state.view="detail";state.detailTab="performance";
   $("#d-service").value=id;syncNav();showView();renderDetail();window.scrollTo({top:0,behavior:"smooth"});}
 
+function serviceLogoMark(id){
+  const label=SERVICES[id]?.name||"Servicio";
+  if(id==="app-souls"||id==="souls-simulador"){
+    return '<img src="/assets/souls-in-xtinction-logo-sm.png" alt="Logo de '+label+'" title="'+label+'">';
+  }
+  if(id==="openclaw"){
+    return '<svg role="img" aria-label="Logo de OpenClaw" title="OpenClaw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 8-6-16-3 8H2"/><circle cx="18" cy="12" r="2.5"/></svg>';
+  }
+  return '<svg role="img" aria-label="Logo de Souls Monitor" title="Souls Monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2s7 3 7 9c0 4-3 7-7 11-4-4-7-7-7-11 0-6 7-9 7-9Z"/><circle cx="12" cy="10" r="2.4"/></svg>';
+}
+
 function renderDetailHeader(){
   const s=SERVICES[state.detailService];
-  $("#d-ic").className="d-ic svc-ic "+s.icon;$("#d-ic").innerHTML=svcIcon(state.detailService);
+  $("#d-ic").className="d-ic "+s.icon;
+  $("#d-ic").innerHTML=serviceLogoMark(state.detailService);
   $("#d-name").textContent=s.name;
   $("#d-meta").innerHTML='<span class="badge '+levelClass(s.level)+'"><span class="led"></span> '+s.status+'</span>'+
     '<span class="badge purple"><span class="led"></span> '+s.runtime+'</span>'+
