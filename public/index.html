@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -387,7 +387,7 @@
       </div>
       <div>
         <b>Souls VPS Monitor</b>
-        <span>Contabo · Operaciones</span>
+        <span>Contabo Â· Operaciones</span>
       </div>
     </div>
     <nav class="nav">
@@ -425,12 +425,12 @@
   <div class="app">
     <!-- Topbar -->
     <header class="topbar">
-      <button class="hamburger" id="hamburger" aria-label="Menú">
+      <button class="hamburger" id="hamburger" aria-label="MenÃº">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
       <div class="topbar-title">
         <h1>Souls VPS Monitor</h1>
-        <div class="sub">Contabo · monitor.soulsinxtinction.com · última actualización <span id="lastUpdate">hace 34s</span></div>
+        <div class="sub">Contabo Â· monitor.soulsinxtinction.com Â· Ãºltima actualizaciÃ³n <span id="lastUpdate">hace 34s</span></div>
       </div>
       <div class="topbar-right">
         <span class="pill critical" id="globalStatus"><span class="led"></span> <span id="globalStatusText">Warning</span></span>
@@ -464,11 +464,11 @@
         </select>
       </div>
       <div class="fgroup">
-        <label>Tipo de tráfico</label>
+        <label>Tipo de trÃ¡fico</label>
         <select class="sel" id="fTraffic">
           <option value="all">Todos</option>
-          <option value="pages">Páginas</option>
-          <option value="images">Imágenes</option>
+          <option value="pages">PÃ¡ginas</option>
+          <option value="images">ImÃ¡genes</option>
           <option value="api">API</option>
           <option value="bots">Bots</option>
           <option value="errors">Errores</option>
@@ -514,7 +514,7 @@
         <div class="cols-2">
           <div class="section">
             <div class="sec-head">
-              <h2>Tráfico y transferencia</h2>
+              <h2>TrÃ¡fico y transferencia</h2>
               <span class="desc">requests vs MB transferidos</span>
             </div>
             <div class="body">
@@ -529,7 +529,7 @@
           <div class="section">
             <div class="sec-head">
               <h2>Uso de recursos por servicio</h2>
-              <span class="desc">CPU · RAM · Transferencia</span>
+              <span class="desc">CPU Â· RAM Â· Transferencia</span>
             </div>
             <div class="body">
               <div class="chartbox chart" id="chart-resources"></div>
@@ -546,14 +546,14 @@
         <div class="section">
           <div class="sec-head">
             <h2>Top rutas por consumo</h2>
-            <span class="desc">barras por transferencia · <span id="routesFilterNote" class="mono">todos</span></span>
+            <span class="desc">barras por transferencia Â· <span id="routesFilterNote" class="mono">todos</span></span>
           </div>
           <div class="body"><div class="chart" id="chart-routes"></div></div>
         </div>
 
         <!-- 7. Errores y status codes -->
         <div class="section">
-          <div class="sec-head"><h2>Errores y status codes</h2><span class="desc">últimos 60 minutos</span></div>
+          <div class="sec-head"><h2>Errores y status codes</h2><span class="desc" id="errorsRangeNote">rango seleccionado</span></div>
           <div class="body">
             <div class="cols-2" style="margin-bottom:16px">
               <div>
@@ -562,11 +562,11 @@
                 <div class="chips" id="err-chips"></div>
               </div>
               <div>
-                <div class="panel-title">Endpoints con más errores</div>
+                <div class="panel-title">Endpoints con mÃ¡s errores</div>
                 <div class="ep-list" id="err-endpoints"></div>
               </div>
             </div>
-            <div class="panel-title">Matriz de estado por hora <span class="muted">· salud por servicio en las últimas 24h</span></div>
+            <div class="panel-title">Matriz de estado por hora <span class="muted">Â· salud por servicio en las Ãºltimas 24h</span></div>
             <div class="matrix" id="err-matrix"></div>
             <div class="matrix-legend">
               <span><i style="background:var(--ok)"></i> OK</span>
@@ -580,11 +580,11 @@
         <!-- 8. Bots -->
         <div class="section">
           <div class="sec-head">
-            <h2>Bots y tráfico sospechoso</h2>
+            <h2>Bots y trÃ¡fico sospechoso</h2>
             <div class="head-right">
               <div class="searchbox" style="min-width:150px">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
-                <input id="botSearch" placeholder="Buscar user-agent…">
+                <input id="botSearch" placeholder="Buscar user-agentâ€¦">
               </div>
               <select class="sel" id="botUA">
                 <option value="all">User-agent: Todos</option>
@@ -596,14 +596,14 @@
           <div class="body">
             <div class="cols-32">
               <div>
-                <div class="panel-title">Composición del tráfico</div>
+                <div class="panel-title">ComposiciÃ³n del trÃ¡fico</div>
                 <div class="chart" id="chart-composition"></div>
               </div>
               <div>
                 <div class="panel-title">Detalle de agentes</div>
                 <div class="tbl-wrap">
                   <table id="bots-table">
-                    <thead><tr><th>User-agent</th><th>Tipo</th><th class="num">Requests</th><th>Última vez</th><th>Acción</th></tr></thead>
+                    <thead><tr><th>User-agent</th><th>Tipo</th><th class="num">Requests</th><th>Ãšltima vez</th><th>AcciÃ³n</th></tr></thead>
                     <tbody></tbody>
                   </table>
                 </div>
@@ -614,25 +614,25 @@
 
         <!-- 9. Costos y capacidad -->
         <div class="section">
-          <div class="sec-head"><h2>Costos y capacidad</h2><span class="desc">estimación proporcional configurable</span></div>
+          <div class="sec-head"><h2>Costos y capacidad</h2><span class="desc">estimaciÃ³n proporcional configurable</span></div>
           <div class="body">
             <div class="cols-2">
               <div>
-                <div class="panel-title">Costo mensual VPS <span class="muted">· editable</span></div>
+                <div class="panel-title">Costo mensual VPS <span class="muted">Â· editable</span></div>
                 <div class="cost-input" style="margin-bottom:12px">
-                  <span>€</span><input type="number" id="costGeneral" value="7.95" step="0.5" min="0">
+                  <span>â‚¬</span><input type="number" id="costGeneral" value="7.95" step="0.5" min="0">
                   <span style="font-size:12px;color:var(--faint);font-weight:600">/ mes</span>
                 </div>
                 <div class="chips" style="margin-bottom:12px">
-                  <span class="chip">Proyección <span class="badge warn" id="projState" style="margin-left:4px"><span class="led"></span> Medio</span></span>
+                  <span class="chip">ProyecciÃ³n <span class="badge warn" id="projState" style="margin-left:4px"><span class="led"></span> Medio</span></span>
                 </div>
                 <div class="note">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
-                  Estimación basada en CPU, RAM, disco y transferencia local. No refleja facturación real de Contabo.
+                  EstimaciÃ³n basada en CPU, RAM, disco y transferencia local. No refleja facturaciÃ³n real de Contabo.
                 </div>
               </div>
               <div>
-                <div class="panel-title">Distribución estimada por servicio</div>
+                <div class="panel-title">DistribuciÃ³n estimada por servicio</div>
                 <div id="cost-meters"></div>
               </div>
             </div>
@@ -676,7 +676,7 @@
           </div>
           <div class="tabs" id="d-tabs">
             <button class="tab active" data-tab="performance">Performance</button>
-            <button class="tab" data-tab="trafico">Tráfico</button>
+            <button class="tab" data-tab="trafico">TrÃ¡fico</button>
             <button class="tab" data-tab="logs">Logs y Errores</button>
             <button class="tab" data-tab="storage">Almacenamiento</button>
             <button class="tab" data-tab="costos">Costos</button>
@@ -693,7 +693,7 @@
 <script>
 "use strict";
 /* =========================================================================
-   PALETA (para gráficas SVG)
+   PALETA (para grÃ¡ficas SVG)
 ========================================================================= */
 const C={purple:"#7C3AED",purpleDeep:"#4D3267",purpleSoft:"#D0BCFF",purpleLite:"#F3ECFF",
   gold:"#E0AE60",goldLite:"#F6F3A0",ok:"#10B981",warn:"#F59E0B",crit:"#F43F5E",info:"#38BDF8",
@@ -705,18 +705,18 @@ const C={purple:"#7C3AED",purpleDeep:"#4D3267",purpleSoft:"#D0BCFF",purpleLite:"
 let SERVICES={
   "app-souls":{id:"app-souls",name:"app-souls",status:"Online",level:"ok",runtime:"PM2",
     port:"127.0.0.1:3000",mem:650,cpu:8.4,uptime:"3d 12h",requests:18420,transfer:482,errorRate:0.7,
-    icon:"p",exposure:"Público · Nginx + Cloudflare + HTTPS",alertsW:1,alertsC:1,costShare:60},
+    icon:"p",exposure:"PÃºblico Â· Nginx + Cloudflare + HTTPS",alertsW:1,alertsC:1,costShare:60},
   "openclaw":{id:"openclaw",name:"OpenClaw",status:"Running",level:"ok",runtime:"Docker",
     port:"127.0.0.1:46858",mem:530,cpu:4.2,uptime:"1d 8h",requests:640,transfer:22,errorRate:0.2,
-    icon:"g",exposure:"Privado · 127.0.0.1 (sin exposición pública)",alertsW:0,alertsC:0,costShare:24,
+    icon:"g",exposure:"Privado Â· 127.0.0.1 (sin exposiciÃ³n pÃºblica)",alertsW:0,alertsC:0,costShare:24,
     container:"openclaw-hgga-openclaw-1"},
   "souls-monitor":{id:"souls-monitor",name:"Souls Monitor",status:"Online",level:"ok",runtime:"systemd + Node.js",
     port:"127.0.0.1:3101",mem:14,cpu:1.1,uptime:"18h",requests:210,transfer:8,errorRate:0.0,
-    icon:"i",exposure:"Público · HTTPS + Basic Auth",alertsW:1,alertsC:0,costShare:4,
+    icon:"i",exposure:"PÃºblico Â· HTTPS + Basic Auth",alertsW:1,alertsC:0,costShare:4,
     domain:"monitor.soulsinxtinction.com"},
   "souls-simulador":{id:"souls-simulador",name:"Souls Simulador",status:"Online",level:"ok",runtime:"systemd + Node.js",
     port:"127.0.0.1:2567",mem:80,cpu:1.5,uptime:"1h",requests:0,transfer:0,errorRate:0.0,
-    icon:"p",exposure:"Público · Nginx + Cloudflare + HTTPS",alertsW:0,alertsC:0,costShare:12,
+    icon:"p",exposure:"PÃºblico Â· Nginx + Cloudflare + HTTPS",alertsW:0,alertsC:0,costShare:12,
     domain:"simulador.soulsinxtinction.com"}
 };
 SERVICES["app-souls"].domain="soulsinxtinction.com";
@@ -749,37 +749,37 @@ let BOTS=[
 ];
 
 let ALERTS=[
-  {level:"crit",time:"14:52",svc:"app-souls",msg:"Picos 5xx detectados en la última hora"},
+  {level:"crit",time:"14:52",svc:"app-souls",msg:"Picos 5xx detectados en la Ãºltima hora"},
   {level:"warn",time:"14:31",svc:"app-souls",msg:"Aumento de transferencia en /_next/image"},
-  {level:"warn",time:"13:58",svc:"souls-monitor",msg:"Tráfico sospechoso bloqueado por Basic Auth"},
-  {level:"ok",time:"13:40",svc:"openclaw",msg:"OpenClaw · Telegram default works"},
-  {level:"ok",time:"13:39",svc:"openclaw",msg:"OpenClaw · Telegram imagenes works"}
+  {level:"warn",time:"13:58",svc:"souls-monitor",msg:"TrÃ¡fico sospechoso bloqueado por Basic Auth"},
+  {level:"ok",time:"13:40",svc:"openclaw",msg:"OpenClaw Â· Telegram default works"},
+  {level:"ok",time:"13:39",svc:"openclaw",msg:"OpenClaw Â· Telegram imagenes works"}
 ];
 
 const LOGS=[
-  {time:"14:52:11",svc:"app-souls",sev:"crit",msg:"Internal Server Error en render de bóveda",status:500,route:"/boveda/:slug",ua:"Mozilla/5.0 (usuario)"},
+  {time:"14:52:11",svc:"app-souls",sev:"crit",msg:"Internal Server Error en render de bÃ³veda",status:500,route:"/boveda/:slug",ua:"Mozilla/5.0 (usuario)"},
   {time:"14:49:03",svc:"souls-monitor",sev:"warn",msg:"Intento de acceso no autorizado a /.env",status:401,route:"/.env",ua:"zgrab"},
   {time:"14:47:58",svc:"souls-monitor",sev:"warn",msg:"Intento a /docker-compose.yml bloqueado",status:401,route:"/docker-compose.yml",ua:"python-requests"},
   {time:"14:45:22",svc:"app-souls",sev:"warn",msg:"Latencia elevada en /_next/image",status:200,route:"/_next/image",ua:"Googlebot"},
-  {time:"14:42:10",svc:"openclaw",sev:"ok",msg:"Telegram default works · polling activo",status:200,route:"agent:telegram",ua:"internal"},
-  {time:"14:41:47",svc:"openclaw",sev:"ok",msg:"Agent 'facturas' completó tarea",status:200,route:"agent:facturas",ua:"internal"},
+  {time:"14:42:10",svc:"openclaw",sev:"ok",msg:"Telegram default works Â· polling activo",status:200,route:"agent:telegram",ua:"internal"},
+  {time:"14:41:47",svc:"openclaw",sev:"ok",msg:"Agent 'facturas' completÃ³ tarea",status:200,route:"agent:facturas",ua:"internal"},
   {time:"14:40:31",svc:"souls-monitor",sev:"ok",msg:"Collector updated metrics.json",status:200,route:"collector",ua:"systemd-timer"},
   {time:"14:38:09",svc:"app-souls",sev:"crit",msg:"5xx upstream timeout en API interna",status:502,route:"/api/cartas",ua:"Mozilla/5.0 (usuario)"},
-  {time:"14:36:55",svc:"openclaw",sev:"ok",msg:"Telegram imagenes works · agente 'imagenes'",status:200,route:"agent:imagenes",ua:"internal"},
-  {time:"14:34:12",svc:"app-souls",sev:"warn",msg:"Redirección 301 en ruta legacy",status:301,route:"/laboratorio-old",ua:"Bingbot"},
+  {time:"14:36:55",svc:"openclaw",sev:"ok",msg:"Telegram imagenes works Â· agente 'imagenes'",status:200,route:"agent:imagenes",ua:"internal"},
+  {time:"14:34:12",svc:"app-souls",sev:"warn",msg:"RedirecciÃ³n 301 en ruta legacy",status:301,route:"/laboratorio-old",ua:"Bingbot"},
   {time:"14:31:40",svc:"app-souls",sev:"warn",msg:"Spike de transferencia en /_next/image",status:200,route:"/_next/image",ua:"SiteCheckerBotCrawler"},
-  {time:"14:28:19",svc:"souls-monitor",sev:"warn",msg:"401 Basic Auth · escaneo automatizado",status:401,route:"/admin",ua:"SemrushBot"},
-  {time:"14:25:03",svc:"app-souls",sev:"ok",msg:"Página bóveda servida correctamente",status:200,route:"/boveda",ua:"Mozilla/5.0 (usuario)"},
+  {time:"14:28:19",svc:"souls-monitor",sev:"warn",msg:"401 Basic Auth Â· escaneo automatizado",status:401,route:"/admin",ua:"SemrushBot"},
+  {time:"14:25:03",svc:"app-souls",sev:"ok",msg:"PÃ¡gina bÃ³veda servida correctamente",status:200,route:"/boveda",ua:"Mozilla/5.0 (usuario)"},
   {time:"14:22:47",svc:"app-souls",sev:"crit",msg:"Error 500 en handler de imagen",status:500,route:"/_next/image",ua:"Mozilla/5.0 (usuario)"},
   {time:"14:19:31",svc:"openclaw",sev:"warn",msg:"Reintento API Gemini (rate-limit)",status:429,route:"agent:facturas",ua:"internal"},
   {time:"14:15:08",svc:"souls-monitor",sev:"ok",msg:"Health check dashboard OK",status:200,route:"/healthz",ua:"internal"}
 ];
 
 let STORAGE=[
-  {path:"/opt/apps/app-souls",svc:"app-souls",size:"3.8 GB",pct:62,growth:"+180 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acción"},
-  {path:"/opt/openclaw-hgga/data",svc:"openclaw",size:"1.4 GB",pct:34,growth:"+64 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acción"},
-  {path:"/opt/apps/souls-monitor",svc:"souls-monitor",size:"210 MB",pct:12,growth:"+9 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acción"},
-  {path:"/opt/apps/souls-simulador",svc:"souls-simulador",size:"240 MB",pct:14,growth:"+0 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acción"},
+  {path:"/opt/apps/app-souls",svc:"app-souls",size:"3.8 GB",pct:62,growth:"+180 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acciÃ³n"},
+  {path:"/opt/openclaw-hgga/data",svc:"openclaw",size:"1.4 GB",pct:34,growth:"+64 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acciÃ³n"},
+  {path:"/opt/apps/souls-monitor",svc:"souls-monitor",size:"210 MB",pct:12,growth:"+9 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acciÃ³n"},
+  {path:"/opt/apps/souls-simulador",svc:"souls-simulador",size:"240 MB",pct:14,growth:"+0 MB",risk:"ok",riskLabel:"Bajo",rec:"Sin acciÃ³n"},
   {path:"/var/log/nginx",svc:"app-souls",size:"2.1 GB",pct:78,growth:"+420 MB",risk:"warn",riskLabel:"Medio",rec:"Configurar logrotate"}
 ];
 
@@ -804,6 +804,8 @@ let HOST={
   generatedAt:null
 };
 let liveSnapshot=null;
+let dynamicData={errors:null,bots:null,alerts:null};
+let dynamicRequestSeq=0;
 
 /* =========================================================================
    ESTADO
@@ -884,7 +886,7 @@ function seeded(i,salt){const x=Math.sin((i+1)*12.9898+salt*78.233+state.jitter*
 function levelClass(l){return l==="ok"?"ok":l==="warn"?"warn":l==="crit"?"crit":"info";}
 function svgNode(str){const d=document.createElement("div");d.innerHTML=str;return d.firstElementChild;}
 
-/* factor aplicado por rango + tipo de tráfico */
+/* factor aplicado por rango + tipo de trÃ¡fico */
 function activeFactor(){
   let f=RANGE_FACTOR[state.timeRange];
   if(state.traffic==="images")f*=0.55;
@@ -894,7 +896,7 @@ function activeFactor(){
   else if(state.traffic==="errors")f*=0.09;
   return f;
 }
-/* servicios visibles según filtro */
+/* servicios visibles segÃºn filtro */
 function visibleServices(){return state.service==="all"?SVC_ORDER:[state.service];}
 
 function applyOverview(data){
@@ -1004,7 +1006,7 @@ function applyOverview(data){
         growth:"n/d",
         risk:warn?"warn":"ok",
         riskLabel:warn?"Medio":"Bajo",
-        rec:warn?"Revisar logrotate":"Sin acción"
+        rec:warn?"Revisar logrotate":"Sin acciÃ³n"
       };
     });
   }
@@ -1035,6 +1037,43 @@ async function loadOverview(){
     applyOverview(data);
   }catch(error){
     console.warn("Usando datos mock: no se pudo leer /api/overview",error);
+  }
+}
+
+function rangeLabel(range){
+  return range==="15m"?"Ãºltimos 15 minutos":range==="1h"?"Ãºltima hora":range==="6h"?"Ãºltimas 6 horas":range==="24h"?"Ãºltimas 24 horas":"Ãºltimos 7 dÃ­as";
+}
+function apiQuery(params){
+  const query=new URLSearchParams();
+  Object.entries(params).forEach(([key,value])=>{if(value!=null&&value!=="")query.set(key,value);});
+  return query.toString();
+}
+async function fetchJson(url){
+  const response=await fetch(url,{cache:"no-store"});
+  if(!response.ok)throw new Error("HTTP "+response.status);
+  return response.json();
+}
+async function loadDynamicSections(){
+  const seq=++dynamicRequestSeq;
+  const severity=state.severity==="crit"?"critical":state.severity;
+  const botType=state.botFilter==="susp"?"suspicious":state.botFilter;
+  try{
+    const [errors,bots,alerts]=await Promise.all([
+      fetchJson("/api/errors?"+apiQuery({range:state.timeRange,service:state.service,severity})),
+      fetchJson("/api/bots?"+apiQuery({range:state.timeRange,type:botType,search:state.botSearch})),
+      fetchJson("/api/alerts?"+apiQuery({range:state.timeRange,service:state.service,severity}))
+    ]);
+    if(seq!==dynamicRequestSeq)return;
+    dynamicData={errors,bots,alerts};
+    ALERTS=(alerts.alerts||[]).map(alert=>({
+      level:severityLevel(alert.severity),
+      time:secondsAgo(alert.timestamp),
+      svc:alert.service,
+      msg:(alert.title||"Alerta")+": "+(alert.message||"")
+    }));
+  }catch(error){
+    console.warn("No se pudieron leer los endpoints dinÃ¡micos",error);
+    if(seq===dynamicRequestSeq)dynamicData={errors:null,bots:null,alerts:null};
   }
 }
 
@@ -1073,7 +1112,7 @@ async function refreshResourceCards(){
 }
 
 /* =========================================================================
-   GRÁFICAS SVG
+   GRÃFICAS SVG
 ========================================================================= */
 /* ---- Line/Area chart (dual axis) con tooltip ---- */
 function lineAreaChart(el,series,xLabels,opts={}){
@@ -1141,7 +1180,7 @@ function groupedBars(el,groups,seriesDefs,opts={}){
     const gx=P.l+gw*gi;
     grp.values.forEach((v,bi)=>{
       const bx=gx+gap+bi*bw, by=y(v), bh=P.t+ih-by;
-      s+='<rect x="'+bx+'" y="'+by+'" width="'+(bw-4)+'" height="'+Math.max(0,bh)+'" rx="3" fill="'+seriesDefs[bi].color+'"><title>'+grp.label+' · '+seriesDefs[bi].name+': '+grp.raw[bi]+'</title></rect>';
+      s+='<rect x="'+bx+'" y="'+by+'" width="'+(bw-4)+'" height="'+Math.max(0,bh)+'" rx="3" fill="'+seriesDefs[bi].color+'"><title>'+grp.label+' Â· '+seriesDefs[bi].name+': '+grp.raw[bi]+'</title></rect>';
     });
     s+='<text x="'+(gx+gw/2)+'" y="'+(H-24)+'" text-anchor="middle" font-size="11" font-weight="600" fill="'+C.muted+'">'+grp.label+'</text>';
   });
@@ -1161,7 +1200,7 @@ function horizontalBars(el,items,opts={}){
     s+='<rect x="'+P.l+'" y="'+y+'" width="'+Math.max(3,bw)+'" height="18" rx="4" fill="'+col+'"><title>'+it.label+': '+it.value+' MB</title></rect>';
     s+='<text x="'+(P.l-10)+'" y="'+(y+9)+'" text-anchor="end" font-size="12" font-weight="'+(it.highlight?700:600)+'" fill="'+(it.highlight?C.purple:C.muted)+'" font-family="ui-monospace,Menlo,monospace">'+it.label+'</text>';
     s+='<text x="'+(P.l+Math.max(3,bw)+8)+'" y="'+(y+9)+'" font-size="11.5" font-weight="700" fill="'+C.muted+'">'+it.value+' MB</text>';
-    s+='<text x="'+(P.l-10)+'" y="'+(y+26)+'" text-anchor="end" font-size="10.5" fill="'+C.faint+'">'+fmt(it.sub)+' req · '+it.pct+'%</text>';
+    s+='<text x="'+(P.l-10)+'" y="'+(y+26)+'" text-anchor="end" font-size="10.5" fill="'+C.faint+'">'+fmt(it.sub)+' req Â· '+it.pct+'%</text>';
   });
   s+='</svg>';el.innerHTML=s;
 }
@@ -1181,7 +1220,7 @@ function stackedBars(el,cats,seriesDefs){
     cat.values.forEach((v,si)=>{
       const bh=y(v), by=P.t+ih-y(acc)-bh;
       const r=si===cat.values.length-1?"3":"0";
-      s+='<rect x="'+cx+'" y="'+by+'" width="'+bw+'" height="'+Math.max(0,bh)+'" fill="'+seriesDefs[si].color+'" rx="'+r+'"><title>'+cat.label+' · '+seriesDefs[si].name+': '+v+'</title></rect>';
+      s+='<rect x="'+cx+'" y="'+by+'" width="'+bw+'" height="'+Math.max(0,bh)+'" fill="'+seriesDefs[si].color+'" rx="'+r+'"><title>'+cat.label+' Â· '+seriesDefs[si].name+': '+v+'</title></rect>';
       acc+=v;
     });
     s+='<text x="'+(cx+bw/2)+'" y="'+(H-14)+'" text-anchor="middle" font-size="10.5" fill="'+C.muted+'">'+cat.label+'</text>';
@@ -1204,13 +1243,13 @@ function donutChart(el,segments,opts={}){
   s+='<text x="'+cx+'" y="'+(cy+16)+'" text-anchor="middle" font-size="10.5" fill="'+C.muted+'">'+(opts.centerBottom||"total")+'</text>';
   s+='</svg></div><div class="donut-legend">';
   segments.forEach(seg=>{const pc=Math.round(seg.value/total*100);
-    s+='<div class="dl"><span class="sw" style="background:'+seg.color+'"></span><span class="nm">'+seg.name+'</span><span class="pc">'+pc+'%</span>'+(seg.count!=null?'<span class="ct">· '+fmt(seg.count)+'</span>':'')+'</div>';});
+    s+='<div class="dl"><span class="sw" style="background:'+seg.color+'"></span><span class="nm">'+seg.name+'</span><span class="pc">'+pc+'%</span>'+(seg.count!=null?'<span class="ct">Â· '+fmt(seg.count)+'</span>':'')+'</div>';});
   s+='</div></div>';
   el.innerHTML=s;
 }
 
 /* =========================================================================
-   RENDER · VISTA GENERAL
+   RENDER Â· VISTA GENERAL
 ========================================================================= */
 function renderResourceCards(){
   const cards=[
@@ -1263,7 +1302,7 @@ function renderKpis(){
     {lbl:"Transferencia 24h",val:fmt(tr*f)+" ",unit:"MB",st:"ok",d:"+8.4%",dir:"up",ic:'<path d="M12 19V6M5 12l7-7 7 7"/>'},
     {lbl:"Requests 24h",val:fmt(req*f),unit:"",st:"ok",d:"+3.1%",dir:"up",ic:'<path d="M3 12h4l3 8 4-16 3 8h4"/>'},
     {lbl:"Error rate",val:fmt1(err)+"%",unit:"",st:err>0.6?"warn":"ok",d:"+0.2pp",dir:"up",bad:true,ic:'<path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>'},
-    {lbl:"5xx últimos 60m",val:fmt(five),unit:"",st:five>10?"crit":five>3?"warn":"ok",d:"+"+Math.round(five*0.8),dir:"up",bad:true,ic:'<path d="M18 6 6 18M6 6l12 12"/>'},
+    {lbl:"5xx Ãºltimos 60m",val:fmt(five),unit:"",st:five>10?"crit":five>3?"warn":"ok",d:"+"+Math.round(five*0.8),dir:"up",bad:true,ic:'<path d="M18 6 6 18M6 6l12 12"/>'},
     {lbl:"CPU VPS",val:fmtMaybe(cpu,value=>fmt1(Math.max(0,value))+"%"),unit:"",st:cpu>70?"crit":cpu>45?"warn":"ok",d:"-1.2pp",dir:"down",ic:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>'},
     {lbl:"RAM VPS",val:fmtMaybe(ramMB,value=>(value/1024).toFixed(2)+" "),unit:ramMB==null?"":"GB",st:HOST.ramPercent>85?"crit":HOST.ramPercent>75?"warn":"ok",d:fmtMaybe(HOST.ramPercent,value=>fmt1(value)+"%"),dir:"up",ic:'<rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 7V5M12 7V5M17 7V5M7 21v-2M17 21v-2"/>'},
     {lbl:"Disco usado",val:fmtMaybe(HOST.diskUsedGb,value=>fmt1(value)+" "),unit:HOST.diskUsedGb==null?"":"GB",st:HOST.diskPercent>90?"crit":HOST.diskPercent>75?"warn":"ok",d:fmtMaybe(HOST.diskPercent,value=>fmt1(value)+"%"),dir:"up",ic:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/>'},
@@ -1271,7 +1310,7 @@ function renderKpis(){
   ];
   $("#g-kpis").innerHTML=kpis.map(k=>{
     const dcls=k.dir==="up"?(k.bad?"up bad":"up"):k.dir==="down"?"down":"flat";
-    const arrow=k.dir==="up"?"▲":k.dir==="down"?"▼":"■";
+    const arrow=k.dir==="up"?"â–²":k.dir==="down"?"â–¼":"â– ";
     return '<div class="kpi"><div class="top"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+k.ic+'</svg></div><span class="lbl">'+k.lbl+'</span><span class="st '+k.st+'"></span></div>'+
       '<div class="val">'+k.val+'<small>'+k.unit+'</small></div>'+
       (prev?'<span class="delta '+dcls+'">'+arrow+' '+k.d+' <span style="opacity:.7;font-weight:600">vs ant.</span></span>':'<span class="delta '+dcls+'">'+arrow+' '+k.d+'</span>')+
@@ -1289,7 +1328,7 @@ function renderServices(){
       (s.alertsW>0?' <span class="badge warn"><span class="led"></span> '+s.alertsW+' warn</span>':'')||'<span class="badge ok"><span class="led"></span> Sin alertas</span>';
     return '<div class="svc" data-open="'+id+'">'+
       '<div class="svc-top"><div class="svc-ic '+s.icon+'">'+svcIcon(id)+'</div>'+
-      '<div><h3>'+s.name+'</h3><div class="rt">'+s.runtime+' · '+s.port+'</div></div>'+
+      '<div><h3>'+s.name+'</h3><div class="rt">'+s.runtime+' Â· '+s.port+'</div></div>'+
       '<span class="badge-st badge '+levelClass(s.level)+'"><span class="led"></span> '+s.status+'</span></div>'+
       '<div class="metrics">'+
         '<div class="metric"><span class="m-l">CPU</span><span class="m-v">'+s.cpu+'%</span></div>'+
@@ -1344,62 +1383,60 @@ function renderRoutesChart(){
 }
 
 function renderErrors(){
-  const f=Math.min(1.3,RANGE_FACTOR[state.timeRange]/RANGE_FACTOR["1h"]);
-  const counts=liveSnapshot?.nginx?.statusCounts||{};
-  const group=(prefix,fallback)=>Object.entries(counts).filter(([code])=>code.startsWith(prefix)).reduce((sum,[,count])=>sum+Number(count||0),0)||fallback;
-  const c2=group("2",Math.round(14210*activeFactor()));
-  const c3=group("3",Math.round(890*activeFactor()));
-  const c4=group("4",Math.round(310*activeFactor()));
-  const c5=Math.max(0,group("5",Math.round(23*f+seeded(9,state.jitter)*4)));
+  const data=dynamicData.errors;
+  $("#errorsRangeNote").textContent=rangeLabel(state.timeRange);
+  if(!data){
+    $("#err-kpis").innerHTML=emptyState("Sin datos historicos de errores");
+    $("#err-chips").innerHTML="";
+    $("#err-endpoints").innerHTML=emptyState("Sin endpoints con errores");
+    $("#err-matrix").innerHTML=emptyState("Sin matriz historica");
+    return;
+  }
+  const c2=data.statusGroups?.["2xx"]||0;
+  const c3=data.statusGroups?.["3xx"]||0;
+  const c4=data.statusGroups?.["4xx"]||0;
+  const c5=data.statusGroups?.["5xx"]||0;
   $("#err-kpis").innerHTML=[
-    {k:"Total requests",v:fmt(c2+c3+c4+c5)},
+    {k:"Total requests",v:fmt(data.totalRequests||0)},
     {k:"4xx",v:fmt(c4),s:"warn"},
     {k:"5xx",v:fmt(c5),s:"crit"},
-    {k:"Error rate",v:(((c4+c5)/Math.max(1,c2+c3+c4+c5))*100).toFixed(2)+"%",s:"warn"}
+    {k:"Error rate",v:fmt1(data.errorRate||0)+"%",s:"warn"}
   ].map(m=>'<div class="mini"><div class="k">'+m.k+'</div><div class="v" '+(m.s?'style="color:var(--'+m.s+')"':'')+'>'+m.v+'</div></div>').join("");
   $("#err-chips").innerHTML=[
     {l:"2xx",v:c2,c:"ok"},{l:"3xx",v:c3,c:"info"},{l:"4xx",v:c4,c:"warn"},{l:"5xx",v:c5,c:"crit"}
   ].map(x=>'<span class="chip"><span class="badge '+x.c+'"><span class="led"></span>'+x.l+'</span> <b>'+fmt(x.v)+'</b></span>').join("");
-  const eps=(liveSnapshot?.nginx?.topRoutes||[])
-    .filter(route=>route.error4xx||route.error5xx)
-    .slice(0,5)
-    .map(route=>({r:route.route,c:(route.error4xx||0)+(route.error5xx||0),s:route.error5xx?"crit":"warn"}));
-  if(!eps.length)eps.push(
-    {r:"/boveda/:slug",c:9,s:"crit"},{r:"/_next/image",c:6,s:"crit"},{r:"/api/cartas",c:4,s:"warn"},
-    {r:"/api/laboratorio",c:2,s:"warn"},{r:"/boveda",c:1,s:"warn"}
-  );
-  $("#err-endpoints").innerHTML=eps.map(e=>'<div class="ep"><span class="badge '+e.s+'"><span class="led"></span></span><span class="rt">'+e.r+'</span><span class="ct" style="color:var(--'+e.s+')">'+e.c+' err</span></div>').join("");
-  // matrix
-  const hours=24;let m="";
-  visibleServices().forEach((id,si)=>{const s=SERVICES[id];let cells="";
-    for(let h=0;h<hours;h++){const rnd=seeded(h*3+si*7,state.jitter);let cls="";
-      if(id==="app-souls"&&(h===h && rnd>0.86))cls="crit";else if(rnd>0.9)cls="warn";else if(rnd>0.82)cls="warn";
-      if(state.severity==="ok"&&cls)cls="idle";
-      if(state.severity==="crit"&&cls!=="crit")cls=cls==="warn"?"idle":cls;
-      cells+='<div class="cell '+cls+'" title="'+s.name+' · h-'+(hours-h)+'"></div>';}
+  const eps=(data.topErrorEndpoints||[]).map(route=>({r:route.route,c:route.errors,s:route.severity}));
+  $("#err-endpoints").innerHTML=eps.length?eps.map(e=>'<div class="ep"><span class="badge '+e.s+'"><span class="led"></span></span><span class="rt">'+e.r+'</span><span class="ct" style="color:var(--'+e.s+')">'+e.c+' err</span></div>').join(""):emptyState("Sin endpoints con errores");
+  let m="";
+  const rows=data.matrix||[];
+  if(!rows.length){$("#err-matrix").innerHTML=emptyState("Sin matriz historica");return;}
+  rows.forEach(row=>{const s=SERVICES[row.service]||{name:row.service};let cells="";
+    (row.buckets||[]).forEach(cell=>{const cls=cell.status==="idle"?"":cell.status;cells+='<div class="cell '+cls+'" title="'+s.name+' - '+cell.bucket+'"></div>';});
     m+='<div class="mrow"><span class="mname">'+s.name+'</span><div class="cells">'+cells+'</div></div>';});
   m+='<div class="axis"><span>-24h</span><span>-18h</span><span>-12h</span><span>-6h</span><span>ahora</span></div>';
   $("#err-matrix").innerHTML=m;
 }
 
 function renderComposition(){
-  const f=activeFactor();
-  let real=68,bot=22,susp=10;
-  if(state.traffic==="bots"){real=8;bot=70;susp=22;}
-  else if(state.traffic==="errors"){real=40;bot=18;susp=42;}
-  const totalReq=Math.round(19270*f);
+  const data=dynamicData.bots;
+  if(!data){$("#chart-composition").innerHTML=emptyState("Sin composicion historica");return;}
+  const totalReq=data.totalRequests||0;
+  const byType=Object.fromEntries((data.composition||[]).map(item=>[item.type,item]));
   donutChart($("#chart-composition"),[
-    {name:"Usuarios reales",color:C.purple,value:real,count:Math.round(totalReq*real/100)},
-    {name:"Bots conocidos",color:C.gold,value:bot,count:Math.round(totalReq*bot/100)},
-    {name:"Sospechosos",color:C.crit,value:susp,count:Math.round(totalReq*susp/100)}
+    {name:"Usuarios reales",color:C.purple,value:byType.real?.percent||0,count:byType.real?.requests||0},
+    {name:"Bots conocidos",color:C.gold,value:byType.known_bot?.percent||0,count:byType.known_bot?.requests||0},
+    {name:"Sospechosos",color:C.crit,value:byType.suspicious?.percent||0,count:byType.suspicious?.requests||0}
   ],{centerTop:fmt(totalReq),centerBottom:"requests"});
 }
 
 function renderBotsTable(){
-  const q=state.botSearch.toLowerCase();
-  let rows=BOTS.filter(b=>b.ua.toLowerCase().includes(q));
-  if(state.botFilter==="bot")rows=rows.filter(b=>b.type==="bot");
-  else if(state.botFilter==="susp")rows=rows.filter(b=>b.type==="susp");
+  const rows=(dynamicData.bots?.agents||[]).map(agent=>({
+    ua:agent.userAgent,
+    type:agent.type==="bot"?"bot":"susp",
+    requests:agent.requests,
+    last:secondsAgo(agent.lastSeen),
+    action:agent.action
+  }));
   const tb=$("#bots-table tbody");
   if(!rows.length){tb.innerHTML='<tr><td colspan="5">'+emptyState("Sin agentes que coincidan con el filtro")+'</td></tr>';return;}
   tb.innerHTML=rows.map(b=>{
@@ -1413,7 +1450,7 @@ function renderCosts(){
   const cost=state.monthlyCost;
   const meters=SVC_ORDER.map(id=>{const s=SERVICES[id];const c=cost*s.costShare/100;
     const col=id==="app-souls"?C.purple:id==="openclaw"?C.gold:id==="souls-simulador"?C.purpleDeep:C.info;
-    return '<div class="meter"><div class="mt-top"><span class="nm">'+s.name+'</span><span class="pc">'+s.costShare+'%</span><span class="cost">€'+c.toFixed(2)+'</span></div>'+
+    return '<div class="meter"><div class="mt-top"><span class="nm">'+s.name+'</span><span class="pc">'+s.costShare+'%</span><span class="cost">â‚¬'+c.toFixed(2)+'</span></div>'+
       '<div class="track"><div class="fill" style="width:'+s.costShare+'%;background:'+col+'"></div></div></div>';}).join("");
   $("#cost-meters").innerHTML=meters;
   const proj=cost<10?{l:"Bajo",c:"ok"}:cost<25?{l:"Medio",c:"warn"}:{l:"Alto",c:"crit"};
@@ -1421,20 +1458,18 @@ function renderCosts(){
 }
 
 function renderAlerts(){
-  let a=ALERTS.slice();
-  if(state.severity!=="all")a=a.filter(x=>x.level===state.severity);
-  if(state.service!=="all")a=a.filter(x=>x.svc===state.service);
+  const a=ALERTS.slice();
   $("#alertsNote").textContent=a.length+" evento(s)";
   if(!a.length){$("#g-alerts").innerHTML=emptyState("Sin alertas para el filtro seleccionado");return;}
   $("#g-alerts").innerHTML=a.map(x=>{
     const led="led-"+x.level;
     return '<div class="tl"><div class="tick"><i class="'+led+'"></i></div><div class="body-tl">'+
-      '<div class="meta"><span class="badge '+x.level+'"><span class="led"></span> '+sevLabel(x.level)+'</span> <b>'+x.time+'</b> · '+SERVICES[x.svc].name+'</div>'+
+      '<div class="meta"><span class="badge '+x.level+'"><span class="led"></span> '+sevLabel(x.level)+'</span> <b>'+x.time+'</b> Â· '+SERVICES[x.svc].name+'</div>'+
       '<div class="msg">'+x.msg+'</div></div></div>';
   }).join("");
 }
 function sevLabel(l){return l==="ok"?"OK":l==="warn"?"Warning":l==="crit"?"Critical":"Info";}
-function emptyState(t){return '<div class="empty"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 14h8"/></svg><b>'+t+'</b><span>Ajusta los filtros para ver más datos</span></div>';}
+function emptyState(t){return '<div class="empty"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 14h8"/></svg><b>'+t+'</b><span>Ajusta los filtros para ver mÃ¡s datos</span></div>';}
 
 function renderGeneral(){
   renderResourceCards();renderKpis();renderServices();renderTrafficChart();renderResourcesChart();
@@ -1442,7 +1477,7 @@ function renderGeneral(){
 }
 
 /* =========================================================================
-   RENDER · VISTA DETALLE
+   RENDER Â· VISTA DETALLE
 ========================================================================= */
 function openDetail(id){state.detailService=id;state.view="detail";state.detailTab="performance";
   $("#d-service").value=id;syncNav();showView();renderDetail();window.scrollTo({top:0,behavior:"smooth"});}
@@ -1500,11 +1535,11 @@ function tabPerformance(id,s){
   else if(id==="openclaw")runtimeTable=rtTable(["Container","Image","Restarts","Memory","CPU"],[s.container||"openclaw-hgga-openclaw-1",s.image||"openclaw-hgga-patched",s.restarts??"n/d",s.mem+" MB",s.cpu+"%"]);
   else if(id==="souls-simulador")runtimeTable=rtTable(["systemd service","Puerto","Dominio","Memory","CPU"],["souls-simulador.service",s.port,s.domain||"simulador.soulsinxtinction.com",s.mem+" MB",s.cpu+"%"]);
   else runtimeTable=rtTable(["systemd service","Collector timer","Metrics age","Memory","CPU"],["souls-monitor.service","souls-monitor-collector.timer (60s)",secondsAgo(HOST.generatedAt),s.mem+" MB",s.cpu+"%"]);
-  return '<div class="sec-block"><h3>CPU y RAM en el tiempo <span class="muted">· '+state.timeRange+'</span></h3>'+
+  return '<div class="sec-block"><h3>CPU y RAM en el tiempo <span class="muted">Â· '+state.timeRange+'</span></h3>'+
     '<div class="chartbox chart" id="chart-cpuram"></div>'+
     '<div class="legend"><span class="li"><span class="sw line" style="background:'+C.purple+'"></span> CPU %</span><span class="li"><span class="sw line" style="background:'+C.gold+'"></span> RAM %</span></div></div>'+
     '<div class="sec-block"><h3>Runtime</h3><div class="tbl-wrap">'+runtimeTable+'</div></div>'+
-    '<div class="sec-block"><h3>Red y disco <span class="muted">· indicadores</span></h3>'+
+    '<div class="sec-block"><h3>Red y disco <span class="muted">Â· indicadores</span></h3>'+
     '<div class="kv">'+
       kvItem("Network In",(id==="app-souls"?"12.4":id==="openclaw"?"3.1":"0.8")+" MB/s")+
       kvItem("Network Out",(id==="app-souls"?"8.7":id==="openclaw"?"1.9":"0.4")+" MB/s")+
@@ -1526,11 +1561,11 @@ function afterPerf(id,s){
 function rtTable(heads,vals){return '<table style="min-width:0"><thead><tr>'+heads.map(h=>'<th>'+h+'</th>').join("")+'</tr></thead><tbody><tr>'+vals.map((v,i)=>'<td class="'+(i===0?'mono':'')+'">'+v+'</td>').join("")+'</tr></tbody></table>';}
 function kvItem(k,v){return '<div class="item"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>';}
 
-/* ---- Tab Tráfico ---- */
+/* ---- Tab TrÃ¡fico ---- */
 function tabTrafico(id,s){
   let table="";
   if(id==="app-souls"){
-    table='<div class="sec-block"><h3>Métricas de tráfico</h3><div class="kv">'+kvItem("Request rate","~"+fmt(Math.max(1,s.requests/1440))+" / min")+kvItem("Transferencia 24h",s.transfer+" MB")+kvItem("Rutas activas",TOP_ROUTES.length)+kvItem("Peak concurrencia",Math.max(8,Math.round(s.requests/210))+" req/s")+'</div></div>'+
+    table='<div class="sec-block"><h3>MÃ©tricas de trÃ¡fico</h3><div class="kv">'+kvItem("Request rate","~"+fmt(Math.max(1,s.requests/1440))+" / min")+kvItem("Transferencia 24h",s.transfer+" MB")+kvItem("Rutas activas",TOP_ROUTES.length)+kvItem("Peak concurrencia",Math.max(8,Math.round(s.requests/210))+" req/s")+'</div></div>'+
       '<div class="sec-block"><h3>Top endpoints</h3><div class="tbl-wrap"><table><thead><tr><th>Ruta</th><th class="num">Requests</th><th class="num">Transfer</th><th>Riesgo</th></tr></thead><tbody>'+
       TOP_ROUTES.map(r=>'<tr><td class="mono">'+r.route+'</td><td class="num">'+fmt(r.requests)+'</td><td class="num">'+r.transfer+' MB</td><td><span class="badge '+r.risk+'"><span class="led"></span> '+r.riskLabel+'</span></td></tr>').join("")+'</tbody></table></div></div>';
   }else if(id==="openclaw"){
@@ -1553,13 +1588,13 @@ function tabTrafico(id,s){
       '<tr><td class="mono">/:process/:room</td><td>WebSocket de sala</td><td><span class="badge ok"><span class="led"></span> OK</span></td></tr></tbody></table></div></div>';
   }else{
     table='<div class="sec-block"><h3>Dashboard y salud</h3><div class="kv">'+
-      kvItem("Requests dashboard","210")+kvItem("401 Basic Auth","37")+kvItem("Health checks","OK · cada 60s")+kvItem("metrics.json","actualizado hace 42s")+'</div></div>'+
+      kvItem("Requests dashboard","210")+kvItem("401 Basic Auth","37")+kvItem("Health checks","OK Â· cada 60s")+kvItem("metrics.json","actualizado hace 42s")+'</div></div>'+
       '<div class="sec-block"><h3>Eventos recientes</h3><div class="tbl-wrap"><table><thead><tr><th>Evento</th><th class="num">Conteo</th><th>Estado</th></tr></thead><tbody>'+
       '<tr><td>Actualizaciones metrics.json</td><td class="num">1,440</td><td><span class="badge ok"><span class="led"></span> OK</span></td></tr>'+
       '<tr><td>401 por Basic Auth</td><td class="num">37</td><td><span class="badge warn"><span class="led"></span> Escaneos</span></td></tr>'+
       '<tr><td>Health checks fallidos</td><td class="num">0</td><td><span class="badge ok"><span class="led"></span> OK</span></td></tr></tbody></table></div></div>';
   }
-  return '<div class="sec-block"><h3>Status codes <span class="muted">· distribución por hora</span></h3><div class="chart" id="chart-status"></div>'+
+  return '<div class="sec-block"><h3>Status codes <span class="muted">Â· distribuciÃ³n por hora</span></h3><div class="chart" id="chart-status"></div>'+
     '<div class="legend"><span class="li"><span class="sw" style="background:'+C.ok+'"></span> 2xx</span><span class="li"><span class="sw" style="background:'+C.info+'"></span> 3xx</span><span class="li"><span class="sw" style="background:'+C.warn+'"></span> 4xx</span><span class="li"><span class="sw" style="background:'+C.crit+'"></span> 5xx</span></div></div>'+table;
 }
 function afterTrafico(id,s){
@@ -1576,9 +1611,9 @@ function afterTrafico(id,s){
 
 /* ---- Tab Logs ---- */
 function tabLogs(id,s){
-  return '<div class="sec-block"><h3>Logs y errores <span class="muted">· '+s.name+'</span></h3>'+
+  return '<div class="sec-block"><h3>Logs y errores <span class="muted">Â· '+s.name+'</span></h3>'+
     '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">'+
-      '<div class="searchbox"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg><input id="logSearch" placeholder="Buscar ruta o mensaje…" value="'+state.logSearch+'"></div>'+
+      '<div class="searchbox"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg><input id="logSearch" placeholder="Buscar ruta o mensajeâ€¦" value="'+state.logSearch+'"></div>'+
       '<select class="sel" id="logStatus"><option value="all">Status: Todos</option><option value="2">2xx</option><option value="3">3xx</option><option value="4">4xx</option><option value="5">5xx</option></select>'+
       '<select class="sel" id="logUA"><option value="all">User-agent: Todos</option><option value="user">Usuarios</option><option value="bot">Bots conocidos</option><option value="susp">Sospechosos</option></select>'+
     '</div>'+
@@ -1623,42 +1658,42 @@ function tabStorage(id,s){
       '<td style="min-width:150px"><div class="bar-cell"><div class="track"><div class="fill" style="width:'+st.pct+'%;background:'+(st.risk==="warn"?C.warn:C.purple)+'"></div></div><b>'+st.size+'</b></div></td>'+
       '<td>'+st.growth+'</td><td><span class="badge '+st.risk+'"><span class="led"></span> '+st.riskLabel+'</span></td><td style="color:var(--muted)">'+st.rec+'</td></tr>';
   }).join("");
-  return '<div class="sec-block"><h3>Almacenamiento por ruta <span class="muted">· medidores de ocupación</span></h3>'+
-    '<div class="tbl-wrap"><table><thead><tr><th>Ruta</th><th>Tamaño</th><th>Crecimiento 24h</th><th>Riesgo</th><th>Recomendación</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'+
+  return '<div class="sec-block"><h3>Almacenamiento por ruta <span class="muted">Â· medidores de ocupaciÃ³n</span></h3>'+
+    '<div class="tbl-wrap"><table><thead><tr><th>Ruta</th><th>TamaÃ±o</th><th>Crecimiento 24h</th><th>Riesgo</th><th>RecomendaciÃ³n</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'+
     '<div class="sec-block"><div class="note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>'+
-    '/var/log/nginx crece rápido (+420 MB/24h). Recomendado configurar logrotate para evitar saturar el disco.</div></div>';
+    '/var/log/nginx crece rÃ¡pido (+420 MB/24h). Recomendado configurar logrotate para evitar saturar el disco.</div></div>';
 }
 
 /* ---- Tab Costos ---- */
 function tabCostos(id,s){
-  return '<div class="cols-2"><div class="sec-block"><h3>Participación estimada de costo</h3><div class="chart" id="chart-costdonut"></div></div>'+
+  return '<div class="cols-2"><div class="sec-block"><h3>ParticipaciÃ³n estimada de costo</h3><div class="chart" id="chart-costdonut"></div></div>'+
     '<div class="sec-block"><h3>Costo del servicio</h3>'+
-    '<div class="panel-title">Costo mensual VPS <span class="muted">· editable</span></div>'+
-    '<div class="cost-input" style="margin-bottom:14px"><span>€</span><input type="number" id="costDetail" value="'+state.detailCost.toFixed(2)+'" step="0.5" min="0"><span style="font-size:12px;color:var(--faint);font-weight:600">/ mes</span></div>'+
+    '<div class="panel-title">Costo mensual VPS <span class="muted">Â· editable</span></div>'+
+    '<div class="cost-input" style="margin-bottom:14px"><span>â‚¬</span><input type="number" id="costDetail" value="'+state.detailCost.toFixed(2)+'" step="0.5" min="0"><span style="font-size:12px;color:var(--faint);font-weight:600">/ mes</span></div>'+
     '<div class="kv" style="margin-bottom:14px">'+
       kvItem("Share del servicio",s.costShare+"%")+
-      '<div class="item" style="background:var(--purple-lite);border-color:var(--bd-souls)"><div class="k">Costo estimado del servicio</div><div class="v" id="svcCostOut" style="color:var(--purple);font-size:20px">€'+(state.detailCost*s.costShare/100).toFixed(2)+'</div></div>'+
+      '<div class="item" style="background:var(--purple-lite);border-color:var(--bd-souls)"><div class="k">Costo estimado del servicio</div><div class="v" id="svcCostOut" style="color:var(--purple);font-size:20px">â‚¬'+(state.detailCost*s.costShare/100).toFixed(2)+'</div></div>'+
     '</div>'+
-    '<div class="note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>Estimación orientativa, no facturación real de Contabo.</div>'+
+    '<div class="note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>EstimaciÃ³n orientativa, no facturaciÃ³n real de Contabo.</div>'+
     '</div></div>';
 }
 function afterCostos(id,s){
   donutChart($("#chart-costdonut"),COST_SHARES[id].map(x=>({name:x.k,value:x.v,color:x.c})),{centerTop:s.costShare+"%",centerBottom:"del total"});
   const inp=$("#costDetail");
   inp.addEventListener("input",e=>{const v=parseFloat(e.target.value)||0;state.detailCost=v;
-    $("#svcCostOut").textContent="€"+(v*s.costShare/100).toFixed(2);});
+    $("#svcCostOut").textContent="â‚¬"+(v*s.costShare/100).toFixed(2);});
 }
 
 /* ---- Tab Seguridad ---- */
 function tabSeguridad(id,s){
-  const exposure=id==="app-souls"?{t:"Público",c:"warn",d:"Expuesto por Nginx + Cloudflare + HTTPS"}:
-    id==="openclaw"?{t:"Público protegido",c:"info",d:"Expuesto por Nginx + Cloudflare + HTTPS con Basic Auth en openclaw.soulsinxtinction.com."}:
-    id==="souls-simulador"?{t:"Público",c:"ok",d:"Expuesto por Nginx + Cloudflare + HTTPS en simulador.soulsinxtinction.com."}:
-    {t:"Público protegido",c:"info",d:"HTTPS + Basic Auth en monitor.soulsinxtinction.com"};
+  const exposure=id==="app-souls"?{t:"PÃºblico",c:"warn",d:"Expuesto por Nginx + Cloudflare + HTTPS"}:
+    id==="openclaw"?{t:"PÃºblico protegido",c:"info",d:"Expuesto por Nginx + Cloudflare + HTTPS con Basic Auth en openclaw.soulsinxtinction.com."}:
+    id==="souls-simulador"?{t:"PÃºblico",c:"ok",d:"Expuesto por Nginx + Cloudflare + HTTPS en simulador.soulsinxtinction.com."}:
+    {t:"PÃºblico protegido",c:"info",d:"HTTPS + Basic Auth en monitor.soulsinxtinction.com"};
   const cert=id==="souls-monitor"?{dom:"monitor.soulsinxtinction.com",exp:"2026-09-14",days:74}:
     id==="app-souls"?{dom:"soulsinxtinction.com",exp:"2026-09-14",days:74}:
     id==="souls-simulador"?{dom:"simulador.soulsinxtinction.com",exp:"2026-10-01",days:90}:
-    id==="openclaw"?{dom:"openclaw.soulsinxtinction.com",exp:"2026-10-08",days:89}:{dom:"— (sin dominio público)",exp:"n/a",days:null};
+    id==="openclaw"?{dom:"openclaw.soulsinxtinction.com",exp:"2026-10-08",days:89}:{dom:"â€” (sin dominio pÃºblico)",exp:"n/a",days:null};
   const events=[
     {t:"Intentos a /.env",c:"crit",n:14,d:"Bloqueados por Basic Auth / 404"},
     {t:"Intentos a /docker-compose.yml",c:"crit",n:8,d:"Bloqueados"},
@@ -1667,25 +1702,25 @@ function tabSeguridad(id,s){
   const recs=id==="app-souls"?[
     {t:"WAF de Cloudflare activo",c:"ok",d:"Reglas de bots y rate-limit aplicadas."},
     {t:"Revisar picos 5xx",c:"warn",d:"Correlacionar con transferencia de /_next/image."},
-    {t:"Rotación de logs",c:"warn",d:"Configurar logrotate en /var/log/nginx."}
+    {t:"RotaciÃ³n de logs",c:"warn",d:"Configurar logrotate en /var/log/nginx."}
   ]:id==="openclaw"?[
-    {t:"Basic Auth activo",c:"ok",d:"La interfaz pública exige credenciales antes del proxy a OpenClaw."},
+    {t:"Basic Auth activo",c:"ok",d:"La interfaz pÃºblica exige credenciales antes del proxy a OpenClaw."},
     {t:"Proxy local",c:"ok",d:"Nginx enruta HTTPS hacia 127.0.0.1:46858."},
-    {t:"Tokens Telegram/API",c:"warn",d:"Verificar rotación periódica de credenciales."}
+    {t:"Tokens Telegram/API",c:"warn",d:"Verificar rotaciÃ³n periÃ³dica de credenciales."}
   ]:id==="souls-simulador"?[
     {t:"DNS activo",c:"ok",d:"Cloudflare resuelve simulador.soulsinxtinction.com."},
     {t:"WebSocket probado",c:"ok",d:"Nginx enruta /matchmake y WebSocket al puerto 2567."},
     {t:"TLS activo",c:"ok",d:"Certificado Let's Encrypt emitido hasta 2026-10-01."}
   ]:[
     {t:"Basic Auth funcionando",c:"ok",d:"401 correctos ante escaneos automatizados."},
-    {t:"Bloquear IPs reincidentes",c:"warn",d:"Añadir fail2ban para /.env y /admin."}
+    {t:"Bloquear IPs reincidentes",c:"warn",d:"AÃ±adir fail2ban para /.env y /admin."}
   ];
   return '<div class="cols-2">'+
-    '<div class="sec-block"><h3>Estado de exposición</h3>'+
+    '<div class="sec-block"><h3>Estado de exposiciÃ³n</h3>'+
       '<div class="rec"><span class="badge '+exposure.c+'"><span class="led"></span> '+exposure.t+'</span><div><div class="rec-t">'+s.name+'</div><div class="rec-d">'+exposure.d+'</div></div></div>'+
       '<h3 style="margin-top:16px">Certificado TLS</h3>'+
-      '<div class="kv">'+kvItem("Dominio",'<span class="mono" style="font-size:12px">'+cert.dom+'</span>')+kvItem("Expiración",cert.exp)+
-        kvItem("Estado",cert.days===null?'<span class="badge neutral"><span class="led"></span> N/A</span>':'<span class="badge ok"><span class="led"></span> Válido · '+cert.days+' días</span>')+'</div>'+
+      '<div class="kv">'+kvItem("Dominio",'<span class="mono" style="font-size:12px">'+cert.dom+'</span>')+kvItem("ExpiraciÃ³n",cert.exp)+
+        kvItem("Estado",cert.days===null?'<span class="badge neutral"><span class="led"></span> N/A</span>':'<span class="badge ok"><span class="led"></span> VÃ¡lido Â· '+cert.days+' dÃ­as</span>')+'</div>'+
     '</div>'+
     '<div class="sec-block"><h3>Eventos sospechosos</h3>'+
       events.map(e=>'<div class="rec"><span class="badge '+e.c+'"><span class="led"></span> '+e.n+'</span><div><div class="rec-t">'+e.t+'</div><div class="rec-d">'+e.d+'</div></div></div>').join("")+
@@ -1727,17 +1762,18 @@ $$(".nav-item[data-svc]").forEach(n=>n.addEventListener("click",()=>{openDetail(
 // time range
 $$("#timeSeg button").forEach(b=>b.addEventListener("click",()=>{
   $$("#timeSeg button").forEach(x=>x.classList.remove("active"));b.classList.add("active");
-  state.timeRange=b.dataset.t;render();}));
+  state.timeRange=b.dataset.t;reloadDynamicAndRender();}));
 // selects globales
-$("#fService").addEventListener("change",e=>{state.service=e.target.value;render();});
+$("#fService").addEventListener("change",e=>{state.service=e.target.value;reloadDynamicAndRender();});
 $("#fTraffic").addEventListener("change",e=>{state.traffic=e.target.value;render();});
-$("#fSeverity").addEventListener("change",e=>{state.severity=e.target.value;render();});
+$("#fSeverity").addEventListener("change",e=>{state.severity=e.target.value;reloadDynamicAndRender();});
 // toggles
 $("#autoRefresh").addEventListener("click",function(){state.autoRefresh=!state.autoRefresh;this.classList.toggle("on",state.autoRefresh);toggleAutoRefresh();});
 $("#comparePrev").addEventListener("click",function(){state.comparePrev=!state.comparePrev;this.classList.toggle("on",state.comparePrev);render();});
 // refresh
 $("#refreshBtn").addEventListener("click",doRefresh);
-async function doRefresh(){state.jitter++;const ic=$("#refreshIcon");ic.classList.add("spin");setTimeout(()=>ic.classList.remove("spin"),700);$("#lastUpdate").textContent="actualizando...";await loadOverview();render();}
+async function doRefresh(){state.jitter++;const ic=$("#refreshIcon");ic.classList.add("spin");setTimeout(()=>ic.classList.remove("spin"),700);$("#lastUpdate").textContent="actualizando...";await loadOverview();await loadDynamicSections();render();}
+async function reloadDynamicAndRender(){await loadDynamicSections();render();}
 // detail
 $("#backBtn").addEventListener("click",()=>{state.view="general";render();window.scrollTo({top:0,behavior:"smooth"});});
 $("#d-service").addEventListener("change",e=>{state.detailService=e.target.value;renderDetail();});
@@ -1745,8 +1781,8 @@ $$("#d-tabs .tab").forEach(t=>t.addEventListener("click",()=>{state.detailTab=t.
 // costos general
 $("#costGeneral").addEventListener("input",e=>{state.monthlyCost=parseFloat(e.target.value)||0;renderCosts();});
 // bots filtros
-$("#botSearch").addEventListener("input",e=>{state.botSearch=e.target.value;renderBotsTable();});
-$("#botUA").addEventListener("change",e=>{state.botFilter=e.target.value;renderBotsTable();});
+$("#botSearch").addEventListener("input",e=>{state.botSearch=e.target.value;reloadDynamicAndRender();});
+$("#botUA").addEventListener("change",e=>{state.botFilter=e.target.value;reloadDynamicAndRender();});
 // sidebar mobile
 $("#hamburger").addEventListener("click",()=>{
   const open=!$("#sidebar").classList.contains("open");
@@ -1763,7 +1799,7 @@ function closeSidebar(){
 
 // auto-refresh timer + "hace Ns" contador
 let arTimer=null,tick=34;
-function toggleAutoRefresh(){if(state.autoRefresh){arTimer=setInterval(async()=>{state.jitter++;await loadOverview();render();},30000);}else{clearInterval(arTimer);arTimer=null;}}
+function toggleAutoRefresh(){if(state.autoRefresh){arTimer=setInterval(async()=>{state.jitter++;await loadOverview();await loadDynamicSections();render();},30000);}else{clearInterval(arTimer);arTimer=null;}}
 setInterval(()=>{tick++;$("#lastUpdate").textContent="hace "+tick+"s";},1000);
 setInterval(refreshResourceCards,5000);
 
@@ -1773,6 +1809,7 @@ window.addEventListener("resize",()=>{if(state.view==="general")renderTrafficCha
 /* INIT */
 (async function init(){
   await loadOverview();
+  await loadDynamicSections();
   render();
 })();
 </script>

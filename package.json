@@ -12,9 +12,10 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.10.7",
+    "better-sqlite3": "^12.11.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
-  },
-  "devDependencies": {}
+  }
 }

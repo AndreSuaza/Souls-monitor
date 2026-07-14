@@ -6,4 +6,5 @@ Type=oneshot
 WorkingDirectory=/opt/apps/souls-monitor
 Environment=NODE_ENV=production
 Environment=COLLECTOR_OUTPUT=/opt/souls-monitor/runtime/metrics.json
+Environment=SQLITE_PATH=/opt/souls-monitor/runtime/monitor.sqlite
 ExecStart=/usr/bin/node /opt/apps/souls-monitor/dist/collector.js

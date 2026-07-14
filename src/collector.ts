@@ -3,11 +3,13 @@ import { promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
+import { openMonitorDb, saveMetricsHistory, type HttpRollupInput, type UserAgentType } from "./db.js";
 import type { AlertItem, HostSnapshot, MetricsSnapshot, NginxSnapshot, ServiceSnapshot, StorageSnapshot } from "./types.js";
 
 const execFileAsync = promisify(execFile);
 
 const OUTPUT_PATH = process.env.COLLECTOR_OUTPUT || "/opt/souls-monitor/runtime/metrics.json";
+const SQLITE_PATH = process.env.SQLITE_PATH || "/opt/souls-monitor/runtime/monitor.sqlite";
 const NGINX_ACCESS_LOG = process.env.NGINX_ACCESS_LOG || "/var/log/nginx/app-souls.access.log";
 const NGINX_ACCESS_LOG_PREVIOUS = process.env.NGINX_ACCESS_LOG_PREVIOUS || "/var/log/nginx/app-souls.access.log.1";
 const MAX_LOG_BYTES = Number(process.env.MAX_LOG_BYTES || 3_000_000);
@@ -226,8 +228,33 @@ function normalizeRoute(rawPath: string): string {
     .replace(/\/[A-Za-z0-9_-]{18,}(?=\/|$)/g, "/:slug");
 }
 
-function collectNginxFromText(text: string): NginxSnapshot {
+function parseNginxTimestamp(value: string): string | null {
+  const match = value.match(/^(\d{2})\/([A-Za-z]{3})\/(\d{4}):(\d{2}):(\d{2}):(\d{2}) ([+-]\d{4})$/);
+  if (!match) return null;
+  const months: Record<string, number> = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+  const month = months[match[2]];
+  if (month == null) return null;
+  const offset = match[7];
+  const iso = `${match[3]}-${String(month + 1).padStart(2, "0")}-${match[1]}T${match[4]}:${match[5]}:${match[6]}${offset.slice(0, 3)}:${offset.slice(3)}`;
+  const date = new Date(iso);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+function minuteBucket(iso: string): string {
+  const date = new Date(iso);
+  date.setUTCSeconds(0, 0);
+  return date.toISOString();
+}
+
+function classifyUserAgent(userAgent: string): UserAgentType {
+  if (/googlebot|bingbot|duckduckbot|baiduspider|yandexbot|slurp|facebookexternalhit|twitterbot|linkedinbot/i.test(userAgent)) return "known_bot";
+  if (/bot|crawl|spider|curl|wget|python|scrapy|httpclient|semrush|ahrefs|bytespider|zgrab|sqlmap/i.test(userAgent)) return "suspicious";
+  return "real";
+}
+
+function collectNginxFromText(text: string): { snapshot: NginxSnapshot; rollups: HttpRollupInput[] } {
   const routes = new Map<string, { requests: number; bytes: number; error4xx: number; error5xx: number; requestTimes: number[] }>();
+  const rollups = new Map<string, HttpRollupInput>();
   const statusCounts: Record<string, number> = {};
   const methodCounts: Record<string, number> = {};
   const suspicious = new Map<string, number>();
@@ -235,18 +262,21 @@ function collectNginxFromText(text: string): NginxSnapshot {
   let totalRequests = 0;
   let totalBytes = 0;
 
-  const pattern = /^\S+ - \S+ \[[^\]]+\] "([A-Z]+) ([^" ]+) [^"]*" (\d{3}) (\d+) "[^"]*" "([^"]*)" "[^"]*" rt=([\d.-]+)/;
+  const pattern = /\[([^\]]+)\] "([A-Z]+) ([^" ]+) [^"]*" (\d{3}) (\d+) "[^"]*" "([^"]*)" "[^"]*" rt=([\d.-]+)/;
   for (const line of text.split("\n")) {
     const match = line.match(pattern);
     if (!match) continue;
     analyzedLines += 1;
     totalRequests += 1;
-    const method = match[1];
-    const route = normalizeRoute(match[2]);
-    const status = match[3];
-    const bytes = Number(match[4]) || 0;
-    const userAgent = match[5] || "-";
-    const requestTimeMs = Number(match[6]) * 1000;
+    const timestamp = parseNginxTimestamp(match[1]);
+    const method = match[2];
+    const route = normalizeRoute(match[3]);
+    const status = match[4];
+    const statusCode = Number(status);
+    const bytes = Number(match[5]) || 0;
+    const userAgent = match[6] || "-";
+    const requestTimeMs = Number(match[7]) * 1000;
+    const userAgentType = classifyUserAgent(userAgent);
     totalBytes += bytes;
     statusCounts[status] = (statusCounts[status] || 0) + 1;
     methodCounts[method] = (methodCounts[method] || 0) + 1;
@@ -257,7 +287,25 @@ function collectNginxFromText(text: string): NginxSnapshot {
     if (status.startsWith("5")) entry.error5xx += 1;
     if (Number.isFinite(requestTimeMs)) entry.requestTimes.push(requestTimeMs);
     routes.set(route, entry);
-    if (/bot|crawl|spider|curl|wget|python|scrapy|httpclient|semrush|ahrefs|bytespider|zgrab|sqlmap/i.test(userAgent)) {
+    if (timestamp) {
+      const bucket = minuteBucket(timestamp);
+      const key = ["app-souls", bucket, route, status, method, userAgentType, userAgent].join("\u0000");
+      const current = rollups.get(key) || {
+        bucket,
+        service: "app-souls",
+        route,
+        statusCode,
+        method,
+        userAgentType,
+        userAgent,
+        requests: 0,
+        bytes: 0,
+      };
+      current.requests += 1;
+      current.bytes += bytes;
+      rollups.set(key, current);
+    }
+    if (userAgentType !== "real") {
       suspicious.set(userAgent, (suspicious.get(userAgent) || 0) + 1);
     }
   }
@@ -277,20 +325,23 @@ function collectNginxFromText(text: string): NginxSnapshot {
     .slice(0, 20);
 
   return {
-    analyzedLines,
-    totalRequests,
-    totalBytes,
-    statusCounts,
-    methodCounts,
-    topRoutes,
-    suspiciousUserAgents: [...suspicious.entries()]
-      .map(([userAgent, requests]) => ({ userAgent, requests }))
-      .sort((a, b) => b.requests - a.requests)
-      .slice(0, 20),
+    snapshot: {
+      analyzedLines,
+      totalRequests,
+      totalBytes,
+      statusCounts,
+      methodCounts,
+      topRoutes,
+      suspiciousUserAgents: [...suspicious.entries()]
+        .map(([userAgent, requests]) => ({ userAgent, requests }))
+        .sort((a, b) => b.requests - a.requests)
+        .slice(0, 20),
+    },
+    rollups: [...rollups.values()],
   };
 }
 
-async function collectNginx(): Promise<NginxSnapshot> {
+async function collectNginx(): Promise<{ snapshot: NginxSnapshot; rollups: HttpRollupInput[] }> {
   const [current, previous] = await Promise.all([readTail(NGINX_ACCESS_LOG), readTail(NGINX_ACCESS_LOG_PREVIOUS)]);
   return collectNginxFromText(`${previous}\n${current}`);
 }
@@ -342,7 +393,7 @@ function buildAlerts(snapshot: Omit<MetricsSnapshot, "alerts">): AlertItem[] {
 
 async function main() {
   const host = await collectHost();
-  const [pm2, docker, systemd, nginx, storage] = await Promise.all([
+  const [pm2, docker, systemd, nginxResult, storage] = await Promise.all([
     collectPm2(),
     collectDocker(),
     collectSystemd(),
@@ -352,7 +403,7 @@ async function main() {
   const withoutAlerts = {
     host,
     services: [...pm2, ...docker, ...systemd],
-    nginx,
+    nginx: nginxResult.snapshot,
     storage,
   };
   const snapshot: MetricsSnapshot = {
@@ -363,6 +414,8 @@ async function main() {
   const tmp = `${OUTPUT_PATH}.tmp`;
   await fs.writeFile(tmp, `${JSON.stringify(snapshot, null, 2)}\n`, "utf8");
   await fs.rename(tmp, OUTPUT_PATH);
+  const db = openMonitorDb(SQLITE_PATH);
+  saveMetricsHistory(db, snapshot, nginxResult.rollups);
 }
 
 main().catch((error) => {
