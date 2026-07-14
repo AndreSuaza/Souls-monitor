@@ -190,7 +190,7 @@
   /* ---------- Tables ---------- */
   .tbl-wrap{width:100%;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--bd);border-radius:8px}
   table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
-  #bots-table{min-width:720px}
+  #bots-table{min-width:960px}
   thead th{background:var(--table-head);text-align:left;padding:9px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:700;white-space:nowrap;border-bottom:1px solid var(--bd)}
   tbody td{padding:10px 12px;border-bottom:1px solid var(--bd);vertical-align:middle}
   tbody tr:last-child td{border-bottom:0}
@@ -229,7 +229,8 @@
   /* ---------- Two column layouts ---------- */
   .cols-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   .cols-32{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
-  .cols-2>*,.cols-32>*,.section,.body{min-width:0}
+  .bots-layout{display:grid;grid-template-columns:1fr;gap:18px}
+  .cols-2>*,.cols-32>*,.bots-layout>*,.section,.body{min-width:0}
   @media(max-width:920px){.cols-2,.cols-32{grid-template-columns:1fr}}
 
   /* ---------- Errors section panels (no nested cards) ---------- */
@@ -594,7 +595,7 @@
             </div>
           </div>
           <div class="body">
-            <div class="cols-32">
+            <div class="bots-layout">
               <div>
                 <div class="panel-title">Composición del tráfico</div>
                 <div class="chart" id="chart-composition"></div>
