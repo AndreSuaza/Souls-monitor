@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" role="img" aria-labelledby="title desc">
+  <title id="title">Arquitectura operativa</title>
+  <desc id="desc">Nginx distribuye tráfico a las aplicaciones y Souls Monitor observa procesos, logs y SQLite.</desc>
+  <defs><style>text{font-family:Inter,Arial,sans-serif;fill:#f2f7fc}.box{fill:#10243a;stroke:#48d7ff;stroke-width:2}.line{stroke:#5ce1a7;stroke-width:3;fill:none;marker-end:url(#arrow)}</style><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#5ce1a7"/></marker></defs>
+  <rect width="1200" height="440" rx="24" fill="#07111f"/>
+  <rect class="box" x="45" y="170" width="180" height="90" rx="14"/><text x="135" y="207" text-anchor="middle" font-size="22" font-weight="700">Clientes</text><text x="135" y="235" text-anchor="middle" font-size="15">Web / operadores</text>
+  <rect class="box" x="285" y="170" width="180" height="90" rx="14"/><text x="375" y="207" text-anchor="middle" font-size="22" font-weight="700">Nginx</text><text x="375" y="235" text-anchor="middle" font-size="15">TLS / access logs</text>
+  <rect class="box" x="525" y="50" width="250" height="70" rx="14"/><text x="650" y="92" text-anchor="middle" font-size="18">app-souls · 3000/3001</text>
+  <rect class="box" x="525" y="150" width="250" height="70" rx="14"/><text x="650" y="192" text-anchor="middle" font-size="18">simulador · 2567/2568</text>
+  <rect class="box" x="525" y="250" width="250" height="70" rx="14"/><text x="650" y="292" text-anchor="middle" font-size="18">OpenClaw · Docker</text>
+  <rect class="box" x="900" y="105" width="245" height="100" rx="14"/><text x="1022" y="145" text-anchor="middle" font-size="22" font-weight="700">Souls Monitor</text><text x="1022" y="175" text-anchor="middle" font-size="15">probes · collector</text>
+  <rect class="box" x="900" y="260" width="245" height="70" rx="14"/><text x="1022" y="302" text-anchor="middle" font-size="18">SQLite históricos</text>
+  <path class="line" d="M225 215 H285"/><path class="line" d="M465 215 H525"/><path class="line" d="M465 215 C500 215 490 85 525 85"/><path class="line" d="M465 215 C500 215 490 285 525 285"/><path class="line" d="M775 185 H900"/><path class="line" d="M1022 205 V260"/>
+</svg>

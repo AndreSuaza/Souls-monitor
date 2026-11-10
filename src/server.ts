@@ -2,7 +2,8 @@ import { createServer } from "node:http";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { openMonitorDb, queryAlerts, queryBots, queryErrors } from "./db.js";
+import { openMonitorDb, queryAlerts, queryBots, queryErrors, queryHistory } from "./db.js";
+import { listDocs, readDoc } from "./docs.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -61,6 +62,34 @@ const server = createServer(async (req, res) => {
             : queryAlerts(db, url.searchParams);
       res.writeHead(200, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
       res.end(JSON.stringify(body));
+      return;
+    }
+    if (url.pathname === "/api/history") {
+      const body = queryHistory(openMonitorDb(sqlitePath), url.searchParams);
+      res.writeHead(200, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
+      res.end(JSON.stringify(body));
+      return;
+    }
+    if (url.pathname === "/api/docs") {
+      res.writeHead(200, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
+      res.end(JSON.stringify(await listDocs()));
+      return;
+    }
+    const docMatch = url.pathname.match(/^\/api\/docs\/([^/]+?)(\.md)?$/);
+    if (docMatch) {
+      const document = await readDoc(docMatch[1]);
+      if (!document) {
+        res.writeHead(404, { "content-type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ error: "Document not found" }));
+        return;
+      }
+      const download = Boolean(docMatch[2]);
+      res.writeHead(200, {
+        "content-type": download ? "text/markdown; charset=utf-8" : "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        ...(download ? { "content-disposition": `attachment; filename="${document.fileName}"` } : {}),
+      });
+      res.end(download ? document.markdown : JSON.stringify(document));
       return;
     }
     const file = await serveFile(url.pathname);

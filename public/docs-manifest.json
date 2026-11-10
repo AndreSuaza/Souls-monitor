@@ -1,0 +1,66 @@
+[
+  {
+    "slug": "00-overview",
+    "title": "00-overview.md",
+    "description": "",
+    "category": "Referencia",
+    "order": 999,
+    "fileName": "00-overview.md"
+  },
+  {
+    "slug": "01-local-app-souls",
+    "title": "01-local-app-souls.md",
+    "description": "",
+    "category": "Referencia",
+    "order": 999,
+    "fileName": "01-local-app-souls.md"
+  },
+  {
+    "slug": "02-local-simulador",
+    "title": "02-local-simulador.md",
+    "description": "",
+    "category": "Referencia",
+    "order": 999,
+    "fileName": "02-local-simulador.md"
+  },
+  {
+    "slug": "03-architecture",
+    "title": "03-architecture.md",
+    "description": "",
+    "category": "Referencia",
+    "order": 999,
+    "fileName": "03-architecture.md"
+  },
+  {
+    "slug": "04-deployments",
+    "title": "04-deployments.md",
+    "description": "",
+    "category": "Referencia",
+    "order": 999,
+    "fileName": "04-deployments.md"
+  },
+  {
+    "slug": "05-vps-operations",
+    "title": "05-vps-operations.md",
+    "description": "",
+    "category": "Referencia",
+    "order": 999,
+    "fileName": "05-vps-operations.md"
+  },
+  {
+    "slug": "06-monitoring",
+    "title": "06-monitoring.md",
+    "description": "",
+    "category": "Referencia",
+    "order": 999,
+    "fileName": "06-monitoring.md"
+  },
+  {
+    "slug": "07-openclaw",
+    "title": "07-openclaw.md",
+    "description": "",
+    "category": "Referencia",
+    "order": 999,
+    "fileName": "07-openclaw.md"
+  }
+]
