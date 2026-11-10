@@ -22,6 +22,11 @@ export interface HostSnapshot {
     usedBytes: number;
     usedPercent: number;
   };
+  gpu?: {
+    utilizationPercent: number;
+    memoryUsedBytes?: number | null;
+    memoryTotalBytes?: number | null;
+  } | null;
   disks: Array<{
     mount: string;
     sizeBytes: number;
@@ -122,4 +127,39 @@ export interface HistoryResponse {
     error5xx: number;
     averageRequestTimeMs: number | null;
   }>;
+}
+
+export interface ServiceDetailResponse {
+  range: string;
+  service: ServiceSnapshot | null;
+  history: {
+    service: string;
+    buckets: HistoryResponse["services"][number]["buckets"];
+    traffic: HistoryResponse["traffic"];
+  };
+  routes: Array<{
+    route: string;
+    requests: number;
+    bytes: number;
+    errors: number;
+    averageRequestTimeMs: number | null;
+  }>;
+  alerts: {
+    range: string;
+    service: string;
+    severity: string;
+    alerts: Array<{ timestamp: string; service: string; severity: Severity; title: string; message: string }>;
+  };
+  errors: {
+    range: string;
+    service: string;
+    severity: string;
+    totalRequests: number;
+    totalBytes: number;
+    statusGroups: Record<"2xx" | "3xx" | "4xx" | "5xx", number>;
+    errorRate: number | null;
+    topErrorEndpoints: Array<{ route: string; errors: number; error4xx: number; error5xx: number; severity: "warn" | "crit" }>;
+    matrix: Array<{ service: string; buckets: Array<{ bucket: string; status: "ok" | "warn" | "crit" | "idle" }> }>;
+  };
+  storage: Array<{ path: string; bytes: number | null }>;
 }

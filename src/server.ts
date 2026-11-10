@@ -2,8 +2,10 @@ import { createServer } from "node:http";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { openMonitorDb, queryAlerts, queryBots, queryErrors, queryHistory } from "./db.js";
+import { openMonitorDb, queryAlerts, queryBots, queryErrors, queryHistory, queryServiceRoutes } from "./db.js";
 import { listDocs, readDoc } from "./docs.js";
+import { serviceDefinition } from "./services.js";
+import type { MetricsSnapshot, ServiceDetailResponse } from "./types.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -68,6 +70,37 @@ const server = createServer(async (req, res) => {
       const body = queryHistory(openMonitorDb(sqlitePath), url.searchParams);
       res.writeHead(200, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
       res.end(JSON.stringify(body));
+      return;
+    }
+    const serviceMatch = url.pathname.match(/^\/api\/services\/([^/]+)$/);
+    if (serviceMatch) {
+      const serviceId = decodeURIComponent(serviceMatch[1]);
+      const definition = serviceDefinition(serviceId);
+      if (!definition) {
+        res.writeHead(404, { "content-type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ error: "Service not found" }));
+        return;
+      }
+      const params = new URLSearchParams(url.searchParams);
+      params.set("service", serviceId);
+      const db = openMonitorDb(sqlitePath);
+      const history = queryHistory(db, params);
+      const current = await fs.readFile(metricsPath, "utf8").then((value) => JSON.parse(value) as MetricsSnapshot).catch(() => null);
+      const detail: ServiceDetailResponse = {
+        range: history.range,
+        service: current?.services.find((service) => service.id === serviceId) || null,
+        history: {
+          service: serviceId,
+          buckets: history.services.find((item) => item.service === serviceId)?.buckets || [],
+          traffic: history.traffic,
+        },
+        routes: queryServiceRoutes(db, params),
+        alerts: queryAlerts(db, params),
+        errors: queryErrors(db, params),
+        storage: (current?.storage.paths || []).filter((item) => definition.storagePaths?.includes(item.path)),
+      };
+      res.writeHead(200, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
+      res.end(JSON.stringify(detail));
       return;
     }
     if (url.pathname === "/api/docs") {

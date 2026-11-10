@@ -28,7 +28,7 @@ export interface ErrorsResponse {
   totalRequests: number;
   totalBytes: number;
   statusGroups: Record<"2xx" | "3xx" | "4xx" | "5xx", number>;
-  errorRate: number;
+  errorRate: number | null;
   topErrorEndpoints: Array<{ route: string; errors: number; error4xx: number; error5xx: number; severity: "warn" | "crit" }>;
   matrix: Array<{ service: ServiceId; buckets: Array<{ bucket: string; status: "ok" | "warn" | "crit" | "idle" }> }>;
 }
@@ -223,6 +223,28 @@ export function queryHistory(db: Database.Database, params: URLSearchParams): Hi
   };
 }
 
+export function queryServiceRoutes(db: Database.Database, params: URLSearchParams) {
+  const range = normalizeRange(params.get("range"));
+  const service = normalizeService(params.get("service"));
+  const since = sinceIso(range);
+  return db.prepare(`
+    SELECT route, SUM(requests) AS requests, SUM(bytes) AS bytes,
+      SUM(CASE WHEN status_code >= 400 THEN requests ELSE 0 END) AS errors,
+      CASE WHEN SUM(request_time_samples) > 0 THEN SUM(request_time_ms_total) / SUM(request_time_samples) ELSE NULL END AS averageRequestTimeMs
+    FROM http_rollups
+    WHERE bucket >= @since AND service = @service
+    GROUP BY route
+    ORDER BY requests DESC, route ASC
+    LIMIT 20
+  `).all({ since, service }) as Array<{
+    route: string;
+    requests: number;
+    bytes: number;
+    errors: number;
+    averageRequestTimeMs: number | null;
+  }>;
+}
+
 export function queryErrors(db: Database.Database, params: URLSearchParams): ErrorsResponse {
   const range = normalizeRange(params.get("range"));
   const service = normalizeService(params.get("service"));
@@ -247,7 +269,7 @@ export function queryErrors(db: Database.Database, params: URLSearchParams): Err
   `).all(filters.values) as Array<{ route: string; error4xx: number; error5xx: number }>;
   return {
     range, service, severity, totalRequests, totalBytes, statusGroups,
-    errorRate: totalRequests ? Number((((statusGroups["4xx"] + statusGroups["5xx"]) / totalRequests) * 100).toFixed(2)) : 0,
+    errorRate: totalRequests ? Number((((statusGroups["4xx"] + statusGroups["5xx"]) / totalRequests) * 100).toFixed(2)) : null,
     topErrorEndpoints: endpointRows.map((row) => ({
       route: row.route,
       errors: Number(row.error4xx || 0) + Number(row.error5xx || 0),

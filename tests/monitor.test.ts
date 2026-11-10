@@ -3,7 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { openMonitorDb, queryErrors, queryHistory, saveMetricsHistory } from "../src/db.js";
+import { openMonitorDb, queryErrors, queryHistory, queryServiceRoutes, saveMetricsHistory } from "../src/db.js";
 import { collectNginxFromText } from "../src/collector.js";
 import type { MetricsSnapshot } from "../src/types.js";
 
@@ -34,6 +34,8 @@ test("SQLite stores real host, service and traffic history", async () => {
     assert.equal(history.services[0]?.service, "app-souls-dev");
     assert.equal(history.traffic[0]?.requests, 1);
     assert.equal(queryErrors(db, new URLSearchParams("range=24h&service=app-souls-dev")).errorRate, 0);
+    assert.equal(queryErrors(db, new URLSearchParams("range=24h&service=souls-monitor")).errorRate, null);
+    assert.deepEqual(queryServiceRoutes(db, new URLSearchParams("range=24h&service=app-souls-dev")), [{ route: "/", requests: 1, bytes: 120, errors: 0, averageRequestTimeMs: 80 }]);
     db.close();
   } finally {
     await rm(directory, { recursive: true, force: true });
