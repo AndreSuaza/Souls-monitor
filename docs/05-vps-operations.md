@@ -21,7 +21,6 @@ siempre confirma el estado real antes de intervenir.
 | Simulador desarrollo | `/opt/apps/souls-simulador-dev/current` | 2568 | `souls-simulador-dev.service` |
 | Monitor | `/opt/apps/souls-monitor` | 3101 | `souls-monitor.service` |
 | Datos del monitor | `/opt/souls-monitor/runtime` | — | JSON + SQLite |
-| OpenClaw | `/opt/openclaw-hgga` | Docker | `openclaw-hgga-openclaw-1` |
 
 Nginx termina TLS y enruta los dominios públicos a esos puertos locales. Los
 logs de acceso observados incluyen:
@@ -32,7 +31,6 @@ logs de acceso observados incluyen:
 /var/log/nginx/souls-simulador.access.log
 /var/log/nginx/souls-simulador-dev.access.log
 /var/log/nginx/souls-monitor.access.log
-/var/log/nginx/openclaw.access.log
 ```
 
 ## Inspección segura

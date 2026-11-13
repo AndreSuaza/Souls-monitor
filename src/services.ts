@@ -76,17 +76,6 @@ export const SERVICE_CATALOG: ServiceDefinition[] = [
     logFiles: ["/var/log/nginx/souls-monitor.access.log"],
     storagePaths: ["/opt/apps/souls-monitor"],
   },
-  {
-    id: "openclaw",
-    name: "OpenClaw",
-    environment: "infrastructure",
-    kind: "docker",
-    url: "https://openclaw.soulsinxtinction.com/",
-    probeUrl: "https://openclaw.soulsinxtinction.com/",
-    dockerName: "openclaw-hgga-openclaw-1",
-    logFiles: ["/var/log/nginx/openclaw.access.log"],
-    storagePaths: ["/opt/openclaw-hgga/data"],
-  },
 ];
 
 export const SERVICE_IDS = SERVICE_CATALOG.map((service) => service.id);

@@ -53,7 +53,6 @@ SQLite y conservar el timestamp de cada probe. Las fuentes que revisa son:
 - `/proc` y `df` para host y disco.
 - PM2 para `app-souls` y `app-souls-dev`.
 - systemd para simuladores y monitor.
-- Docker para OpenClaw.
 - probes HTTP/HTTPS de cada servicio.
 - logs de acceso Nginx y sus rollups.
 

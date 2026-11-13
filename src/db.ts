@@ -379,7 +379,6 @@ function inferService(alert: AlertItem, snapshot: MetricsSnapshot): ServiceId {
   const text = `${alert.title} ${alert.message}`.toLowerCase();
   const matching = snapshot.services.find((service) => text.includes(service.id.toLowerCase()) || text.includes(service.name.toLowerCase()));
   if (matching) return matching.id;
-  if (text.includes("openclaw")) return "openclaw";
   if (text.includes("monitor")) return "souls-monitor";
   return "souls-monitor";
 }

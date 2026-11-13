@@ -5,7 +5,14 @@ import path from "node:path";
 import test from "node:test";
 import { openMonitorDb, queryErrors, queryHistory, queryServiceRoutes, saveMetricsHistory } from "../src/db.js";
 import { collectNginxFromText } from "../src/collector.js";
+import { SERVICE_IDS, serviceDefinition, serviceIdForProcess } from "../src/services.js";
 import type { MetricsSnapshot } from "../src/types.js";
+
+test("retired OpenClaw is not exposed as a monitored service", () => {
+  assert.equal(SERVICE_IDS.includes("openclaw"), false);
+  assert.equal(serviceDefinition("openclaw"), null);
+  assert.equal(serviceIdForProcess("openclaw-hgga-openclaw-1"), null);
+});
 
 test("Nginx parser keeps service identity and request timing", () => {
   const line = `127.0.0.1 - - [10/Nov/2026:12:00:00 +0000] "GET /api/cards?id=123456789012345678 HTTP/1.1" 200 120 "-" "Mozilla/5.0" "-" rt=0.125`;
